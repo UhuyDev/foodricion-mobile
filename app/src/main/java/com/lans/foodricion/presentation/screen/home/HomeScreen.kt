@@ -117,7 +117,8 @@ fun HomeScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(
-                        vertical = 16.dp
+                        top = 16.dp,
+                        bottom = 12.dp
                     ),
                 text = stringResource(R.string._29_jan_2024),
                 color = Black,
