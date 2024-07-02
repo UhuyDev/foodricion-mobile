@@ -1,3 +1,33 @@
 <resources>
-    <string name="app_name">foodricion</string>
+    <string name="app_name">Foodricion</string>
+    <string name="content_description">Content Description</string>
+    <string name="sign_in">Sign In</string>
+    <string name="hello_welcome_back">Hello, welcome back!</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="continue_as_guest">Continue as guest</string>
+    <string name="don_t_have_an_account">Don\'t have an account ?</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="please_enter_your_credentials">Please enter your credentials!</string>
+    <string name="name">Name</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="have_an_account_already">Have an account already ?</string>
+    <string name="please_enter_your_email_to_reset_password">Please enter your email to reset password!</string>
+    <string name="verification_code">Verification Code</string>
+    <string name="new_password">New Password</string>
+    <string name="send_code">Send Code</string>
+    <string name="submit">Submit</string>
+    <string name="back">Back</string>
+    <string name="welcome_user">Welcome, user</string>
+    <string name="daily_nutrition">Daily Nutrition</string>
+    <string name="protein">Protein</string>
+    <string name="carbo">Carbo</string>
+    <string name="fiber">Fiber</string>
+    <string name="fat">Fat</string>
+    <string name="scan">Scan</string>
+    <string name="foods">Foods</string>
+    <string name="bmi">BMI</string>
+    <string name="_29_jan_2024">29 Jan 2024</string>
+    <string name="lorem_ipsum">Lorem ipsum</string>
 </resources>
