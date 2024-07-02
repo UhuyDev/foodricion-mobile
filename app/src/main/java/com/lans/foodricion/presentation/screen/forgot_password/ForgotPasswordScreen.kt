@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.lans.foodricion.R
+import com.lans.foodricion.domain.model.InputWrapper
 import com.lans.foodricion.presentation.component.button.GhostButton
 import com.lans.foodricion.presentation.component.button.LoadingButton
 import com.lans.foodricion.presentation.component.textfield.ValidableTextField
@@ -77,7 +78,7 @@ fun ForgotPasswordScreen(
                     .padding(
                         horizontal = 24.dp
                     ),
-                input = "",
+                input = InputWrapper(),
                 label = stringResource(R.string.email),
                 onValueChange = {}
             )
@@ -92,7 +93,7 @@ fun ForgotPasswordScreen(
                     .padding(
                         horizontal = 24.dp
                     ),
-                input = "",
+                input = InputWrapper(),
                 label = stringResource(R.string.verification_code),
                 onValueChange = {}
             )
@@ -107,7 +108,7 @@ fun ForgotPasswordScreen(
                     .padding(
                         horizontal = 24.dp
                     ),
-                input = "",
+                input = InputWrapper(),
                 label = stringResource(R.string.new_password),
                 isPassword = true,
                 onValueChange = {}

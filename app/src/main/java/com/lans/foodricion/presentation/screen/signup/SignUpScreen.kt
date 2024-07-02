@@ -11,8 +11,14 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -21,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.lans.foodricion.R
+import com.lans.foodricion.presentation.component.alert.Alert
 import com.lans.foodricion.presentation.component.button.LoadingButton
 import com.lans.foodricion.presentation.component.button.TextButton
 import com.lans.foodricion.presentation.component.textfield.ValidableTextField
@@ -33,6 +40,63 @@ fun SignUpScreen(
     viewModel: SignUpViewModel = hiltViewModel(),
     navigateToSignIn: () -> Unit
 ) {
+    val state by viewModel.state
+    var showSuccess by remember {
+        mutableStateOf(Pair(false, ""))
+    }
+    var showAlert by remember {
+        mutableStateOf(Pair(false, ""))
+    }
+
+    if (showAlert.first) {
+        Alert(
+            title = "Error",
+            description = showAlert.second,
+            onDismissRequest = {
+                showAlert = showAlert.copy(first = false)
+            },
+            onConfirmClick = {
+                Button(onClick = {
+                    showAlert = showAlert.copy(first = false)
+                }) {
+                    Text(text = "Close")
+                }
+            }
+        )
+    }
+
+    if (showSuccess.first) {
+        Alert(
+            title = "Sign up success",
+            description = showSuccess.second,
+            onDismissRequest = {
+                showSuccess = showSuccess.copy(first = false)
+            },
+            onConfirmClick = {
+                Button(onClick = {
+                    showSuccess = showSuccess.copy(first = false)
+                    navigateToSignIn.invoke()
+                }) {
+                    Text(text = "Close")
+                }
+            }
+        )
+    }
+
+    LaunchedEffect(state.signUpResponse) {
+        val response = state.signUpResponse
+        val error = state.error
+
+        if (response) {
+            showSuccess = showSuccess.copy(first = true)
+        }
+
+        if (error.isNotBlank()) {
+            showAlert = Pair(true, error)
+            state.error = ""
+        }
+    }
+
     Column(
         modifier = Modifier
             .background(Background)
@@ -79,9 +143,11 @@ fun SignUpScreen(
                     .padding(
                         horizontal = 24.dp
                     ),
-                input = "",
+                input = state.fullname,
                 label = stringResource(R.string.name),
-                onValueChange = {}
+                onValueChange = {
+                    viewModel.onEvent(SignUpUIEvent.FullnameChanged(it))
+                }
             )
             Spacer(
                 modifier = Modifier
@@ -94,9 +160,11 @@ fun SignUpScreen(
                     .padding(
                         horizontal = 24.dp
                     ),
-                input = "",
+                input = state.email,
                 label = stringResource(R.string.email),
-                onValueChange = {}
+                onValueChange = {
+                    viewModel.onEvent(SignUpUIEvent.EmailChanged(it))
+                }
             )
             Spacer(
                 modifier = Modifier
@@ -109,10 +177,12 @@ fun SignUpScreen(
                     .padding(
                         horizontal = 24.dp
                     ),
-                input = "",
+                input = state.password,
                 label = stringResource(R.string.password),
                 isPassword = true,
-                onValueChange = {}
+                onValueChange = {
+                    viewModel.onEvent(SignUpUIEvent.PasswordChanged(it))
+                }
             )
             Spacer(
                 modifier = Modifier
@@ -125,10 +195,12 @@ fun SignUpScreen(
                     .padding(
                         horizontal = 24.dp
                     ),
-                input = "",
+                input = state.confirmPassword,
                 label = stringResource(R.string.confirm_password),
                 isPassword = true,
-                onValueChange = {}
+                onValueChange = {
+                    viewModel.onEvent(SignUpUIEvent.ConfirmPasswordChanged(it))
+                }
             )
             Spacer(
                 modifier = Modifier
@@ -143,8 +215,10 @@ fun SignUpScreen(
                         horizontal = 24.dp
                     ),
                 text = "Sign In",
-                isLoading = false,
-                onClick = {}
+                isLoading = state.isLoading,
+                onClick = {
+                    viewModel.onEvent(SignUpUIEvent.SignUpButtonClicked)
+                }
             )
         }
 
@@ -157,6 +231,7 @@ fun SignUpScreen(
         ) {
             Text(
                 text = stringResource(R.string.have_an_account_already),
+                color = Black,
                 fontSize = 14.sp
             )
             Spacer(
@@ -170,7 +245,7 @@ fun SignUpScreen(
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
                 onClick = {
-                    navigateToSignIn()
+                    navigateToSignIn.invoke()
                 }
             )
         }
