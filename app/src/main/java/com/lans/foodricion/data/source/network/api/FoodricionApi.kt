@@ -26,6 +26,11 @@ interface FoodricionApi {
         @Body requestBody: SignUpRequestDto,
     ): ApiResponse<SignUpResponseDto>
 
+    @POST("refresh-token")
+    suspend fun refreshToken(
+        @Query("refresh_token") refreshToken: String,
+    ): ApiResponse<RefreshTokenResponseDto>
+
     @POST("forgot-password")
     suspend fun forgotPassword(
         @Body requestBody: ForgotPasswordRequestDto,

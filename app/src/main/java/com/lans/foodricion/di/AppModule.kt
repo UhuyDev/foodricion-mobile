@@ -8,7 +8,6 @@ import com.lans.foodricion.data.source.local.DataStoreManager
 import com.lans.foodricion.data.source.network.AuthAuthenticator
 import com.lans.foodricion.data.source.network.AuthInterceptor
 import com.lans.foodricion.data.source.network.api.FoodricionApi
-import com.lans.foodricion.data.source.network.api.RefreshTokenService
 import com.lans.foodricion.domain.interactor.ForgotPasswordInteractor
 import com.lans.foodricion.domain.interactor.IsAuthenticatedInteractor
 import com.lans.foodricion.domain.interactor.SignInInteractor
@@ -54,14 +53,13 @@ object AppModule {
     @Provides
     @Singleton
     fun provideRetrofitClient(
-        dataStoreManager: DataStoreManager,
-        refreshTokenService: RefreshTokenService
+        dataStoreManager: DataStoreManager
     ): OkHttpClient {
         val loggingInterceptor =
             HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
         return OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
-            .authenticator(AuthAuthenticator(dataStoreManager, refreshTokenService))
+            .authenticator(AuthAuthenticator(dataStoreManager))
             .addInterceptor(AuthInterceptor(dataStoreManager))
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
@@ -78,17 +76,6 @@ object AppModule {
             .client(client)
             .build()
             .create()
-    }
-
-    @Provides
-    @Singleton
-    fun provideRefreshTokenService(client: OkHttpClient): RefreshTokenService {
-        return Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(MoshiConverterFactory.create())
-            .client(client)
-            .build()
-            .create(RefreshTokenService::class.java)
     }
 
     @Provides

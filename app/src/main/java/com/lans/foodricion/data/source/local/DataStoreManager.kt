@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -44,10 +43,9 @@ class DataStoreManager @Inject constructor(private val context: Context) {
     fun checkTokenExpiration(): Flow<Boolean> {
         return context.dataStore.data.map { preferences ->
             val expired = preferences[EXPIRED_AT]
-            if(expired != null) {
+            if (expired != null) {
                 expired <= System.currentTimeMillis()
-            }
-            else {
+            } else {
                 false
             }
         }
@@ -61,14 +59,4 @@ class DataStoreManager @Inject constructor(private val context: Context) {
             preferences.remove(EXPIRED_AT)
         }
     }
-
-    val userId: Flow<String>
-        get() = context.dataStore.data.map { preferences ->
-            preferences[USER_ID] ?: ""
-        }
-
-    val accessToken: Flow<String>
-        get() = context.dataStore.data.map { preferences ->
-            preferences[ACCESS_TOKEN] ?: ""
-        }
 }
