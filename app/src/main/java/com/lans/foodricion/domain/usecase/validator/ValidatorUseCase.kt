@@ -5,4 +5,5 @@ interface ValidatorUseCase {
     val fullname: ValidateFullnameUseCase
     val password: ValidatePasswordUseCase
     val confirmPassword: ValidateConfirmPasswordUseCase
+    val otp: ValidateOTPUseCase
 }

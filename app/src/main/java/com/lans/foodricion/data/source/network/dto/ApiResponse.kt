@@ -4,7 +4,7 @@ import com.squareup.moshi.Json
 
 data class ApiResponse<T>(
     @field:Json(name = "code")
-    val status: Int,
+    val code: Int,
     @field:Json(name = "message")
     val message: String?,
     @field:Json(name = "data")

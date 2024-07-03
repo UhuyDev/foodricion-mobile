@@ -29,6 +29,30 @@ class DataStoreManager @Inject constructor(private val context: Context) {
         }
     }
 
+    fun getAccessToken(): Flow<String> {
+        return context.dataStore.data.map { preferences ->
+            preferences[ACCESS_TOKEN] ?: ""
+        }
+    }
+
+    fun getRefreshToken(): Flow<String> {
+        return context.dataStore.data.map { preferences ->
+            preferences[REFRESH_TOKEN] ?: ""
+        }
+    }
+
+    fun checkTokenExpiration(): Flow<Boolean> {
+        return context.dataStore.data.map { preferences ->
+            val expired = preferences[EXPIRED_AT]
+            if(expired != null) {
+                expired <= System.currentTimeMillis()
+            }
+            else {
+                false
+            }
+        }
+    }
+
     suspend fun clear() {
         context.dataStore.edit { preferences ->
             preferences.remove(USER_ID)
@@ -46,16 +70,5 @@ class DataStoreManager @Inject constructor(private val context: Context) {
     val accessToken: Flow<String>
         get() = context.dataStore.data.map { preferences ->
             preferences[ACCESS_TOKEN] ?: ""
-        }
-
-    val isTokenExpired: Flow<Boolean>
-        get() = context.dataStore.data.map { preferences ->
-            val expired = preferences[EXPIRED_AT]
-            if(expired != null) {
-                expired <= System.currentTimeMillis()
-            }
-            else {
-                false
-            }
         }
 }

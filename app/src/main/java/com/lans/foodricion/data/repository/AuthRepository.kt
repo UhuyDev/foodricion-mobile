@@ -4,6 +4,7 @@ import com.lans.foodricion.data.Resource
 import com.lans.foodricion.data.source.local.DataStoreManager
 import com.lans.foodricion.data.source.network.SafeApiCall
 import com.lans.foodricion.data.source.network.api.FoodricionApi
+import com.lans.foodricion.data.source.network.dto.request.SignInRequestDto
 import com.lans.foodricion.data.source.network.dto.request.SignUpRequestDto
 import com.lans.foodricion.data.source.network.dto.response.toDomain
 import com.lans.foodricion.domain.model.Token
@@ -12,15 +13,15 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
-class AuthRepository @Inject constructor (
+class AuthRepository @Inject constructor(
     private val api: FoodricionApi,
     private val dataStoreManager: DataStoreManager,
-): IAuthRepository, SafeApiCall {
+) : IAuthRepository, SafeApiCall {
     override suspend fun isAuthenticated(): Flow<Resource<Boolean>> {
         return flow {
             emit(Resource.Loading)
             try {
-                dataStoreManager.accessToken.collect { token ->
+                dataStoreManager.getAccessToken().collect { token ->
                     emit(Resource.Success(token != ""))
                 }
             } catch (ex: Exception) {
@@ -29,7 +30,12 @@ class AuthRepository @Inject constructor (
         }
     }
 
-    override suspend fun storeSession(userId: String, accessToken: String, refreshToken: String, expiredAt: Long) {
+    override suspend fun storeSession(
+        userId: String,
+        accessToken: String,
+        refreshToken: String,
+        expiredAt: Long
+    ) {
         dataStoreManager.storeData(DataStoreManager.USER_ID, userId)
         dataStoreManager.storeData(DataStoreManager.ACCESS_TOKEN, accessToken)
         dataStoreManager.storeData(DataStoreManager.REFRESH_TOKEN, refreshToken)
@@ -40,10 +46,17 @@ class AuthRepository @Inject constructor (
         return flow {
             emit(Resource.Loading)
             emit(safeCall {
-                api.signin(
-                    username = email,
-                    password = password
-                ).toDomain()
+                val response = api.signin(
+                    SignInRequestDto(
+                        email = email,
+                        password = password
+                    )
+                )
+                if (response.code == 200) {
+                    response.data!!.toDomain()
+                } else {
+                    throw Exception("Username or password was wrong")
+                }
             })
         }
     }
@@ -56,11 +69,13 @@ class AuthRepository @Inject constructor (
         return flow {
             emit(Resource.Loading)
             emit(safeCall {
-                api.signup(SignUpRequestDto(
-                    email = email,
-                    fullname = fullname,
-                    password = password
-                )).status == 201
+                api.signup(
+                    SignUpRequestDto(
+                        email = email,
+                        fullname = fullname,
+                        password = password
+                    )
+                ).code == 201
             })
         }
     }

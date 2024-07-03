@@ -48,23 +48,6 @@ fun SignUpScreen(
         mutableStateOf(Pair(false, ""))
     }
 
-    if (showAlert.first) {
-        Alert(
-            title = "Error",
-            description = showAlert.second,
-            onDismissRequest = {
-                showAlert = showAlert.copy(first = false)
-            },
-            onConfirmClick = {
-                Button(onClick = {
-                    showAlert = showAlert.copy(first = false)
-                }) {
-                    Text(text = "Close")
-                }
-            }
-        )
-    }
-
     if (showSuccess.first) {
         Alert(
             title = "Sign up success",
@@ -76,6 +59,23 @@ fun SignUpScreen(
                 Button(onClick = {
                     showSuccess = showSuccess.copy(first = false)
                     navigateToSignIn.invoke()
+                }) {
+                    Text(text = "Close")
+                }
+            }
+        )
+    }
+
+    if (showAlert.first) {
+        Alert(
+            title = "Error",
+            description = showAlert.second,
+            onDismissRequest = {
+                showAlert = showAlert.copy(first = false)
+            },
+            onConfirmClick = {
+                Button(onClick = {
+                    showAlert = showAlert.copy(first = false)
                 }) {
                     Text(text = "Close")
                 }

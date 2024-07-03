@@ -1,24 +1,43 @@
 package com.lans.foodricion.data.source.network.api
 
 import com.lans.foodricion.data.source.network.dto.ApiResponse
+import com.lans.foodricion.data.source.network.dto.request.ChangePasswordRequestDto
+import com.lans.foodricion.data.source.network.dto.request.ForgotPasswordRequestDto
+import com.lans.foodricion.data.source.network.dto.request.SignInRequestDto
 import com.lans.foodricion.data.source.network.dto.request.SignUpRequestDto
+import com.lans.foodricion.data.source.network.dto.request.VerifyOTPRequestDto
+import com.lans.foodricion.data.source.network.dto.response.RefreshTokenResponseDto
 import com.lans.foodricion.data.source.network.dto.response.SignInResponseDto
 import com.lans.foodricion.data.source.network.dto.response.SignUpResponseDto
 import retrofit2.http.Body
-import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
+import retrofit2.http.Query
 
 interface FoodricionApi {
     @FormUrlEncoded
     @POST("login")
     suspend fun signin(
-        @Field("username") username: String,
-        @Field("password") password: String
-    ): SignInResponseDto
+        @Body requestDto: SignInRequestDto
+    ): ApiResponse<SignInResponseDto>
 
     @POST("register")
     suspend fun signup(
         @Body requestBody: SignUpRequestDto,
     ): ApiResponse<SignUpResponseDto>
+
+    @POST("forgot-password")
+    suspend fun forgotPassword(
+        @Body requestBody: ForgotPasswordRequestDto,
+    ): ApiResponse<Nothing>
+
+    @POST("verify-otp")
+    suspend fun verifyOTP(
+        @Body requestBody: VerifyOTPRequestDto,
+    ): ApiResponse<Nothing>
+
+    @POST("/me/change-password")
+    suspend fun changePassword(
+        @Body requestBody: ChangePasswordRequestDto,
+    ): ApiResponse<Nothing>
 }
