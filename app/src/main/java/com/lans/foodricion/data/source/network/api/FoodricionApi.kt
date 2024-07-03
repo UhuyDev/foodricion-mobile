@@ -15,7 +15,6 @@ import retrofit2.http.POST
 import retrofit2.http.Query
 
 interface FoodricionApi {
-    @FormUrlEncoded
     @POST("login")
     suspend fun signin(
         @Body requestDto: SignInRequestDto
@@ -34,15 +33,15 @@ interface FoodricionApi {
     @POST("forgot-password")
     suspend fun forgotPassword(
         @Body requestBody: ForgotPasswordRequestDto,
-    ): ApiResponse<Nothing>
+    ): ApiResponse<Any>
 
     @POST("verify-otp")
     suspend fun verifyOTP(
         @Body requestBody: VerifyOTPRequestDto,
-    ): ApiResponse<Nothing>
+    ): ApiResponse<Any>
 
     @POST("/me/change-password")
     suspend fun changePassword(
         @Body requestBody: ChangePasswordRequestDto,
-    ): ApiResponse<Nothing>
+    ): ApiResponse<Any>
 }

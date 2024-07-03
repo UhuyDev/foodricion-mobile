@@ -9,7 +9,7 @@ data class ForgotPasswordUIState(
     val isLoading: Boolean = false,
     var error: String = "",
     var isOTPSent: Boolean = false,
-    val isSuccess: Boolean = false,
-    var isSendCodeClicked: Boolean = false,
+    var isCounting: Boolean = false,
+    var isSuccess: Boolean = false,
     var remainingTime: Int = 60
 )

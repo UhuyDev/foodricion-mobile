@@ -9,6 +9,7 @@ import com.lans.foodricion.domain.usecase.ForgotPasswordUseCase
 import com.lans.foodricion.domain.usecase.VerifyOTPUseCase
 import com.lans.foodricion.domain.usecase.validator.ValidatorUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -49,13 +50,7 @@ class ForgotPasswordViewModel @Inject constructor(
             }
 
             is ForgotPasswordUIEvent.SendCodeButtonClicked -> {
-                if(!_state.value.isOTPSent) {
-                    _state.value = _state.value.copy(
-                        isOTPSent = true,
-                        isSendCodeClicked = true
-                    )
-                    sendCode()
-                }
+                sendCode()
             }
 
             is ForgotPasswordUIEvent.SubmitButtonClicked -> {
@@ -66,6 +61,20 @@ class ForgotPasswordViewModel @Inject constructor(
 
     private fun sendCode() {
         val stateValue = _state.value
+
+        if (stateValue.email.value.isBlank() || stateValue.isCounting) {
+            return
+        }
+
+        _state.value = stateValue.copy(isOTPSent = true, isCounting = true,remainingTime = 60)
+
+        viewModelScope.launch {
+            while (_state.value.remainingTime >= 0) {
+                delay(1000L)
+                _state.value = _state.value.copy(remainingTime = _state.value.remainingTime - 1)
+            }
+            _state.value = _state.value.copy(isCounting = false)
+        }
 
         val emailResult = validatorUseCase.email.invoke(stateValue.email.value)
 
