@@ -206,11 +206,17 @@ fun ForgotPasswordScreen(
                             end = 28.dp,
                             bottom = 4.dp
                         ),
-                    text = if (state.isCounting) "Resend Code in ${state.remainingTime} s" else stringResource(
-                        R.string.send_code
-                    ),
+                    text = if (state.isCounting) {
+                        "Resend Code in ${state.remainingTime} s"
+                    } else if (state.isLoading) {
+                        stringResource(R.string.sending)
+                    } else {
+                        stringResource(
+                            R.string.send_code
+                        )
+                    },
                     isEnable = !state.isOTPSent,
-                    color = if (state.isCounting) Color.Gray else Secondary,
+                    color = if (state.isCounting || state.isLoading) Color.Gray else Secondary,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.End,

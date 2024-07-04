@@ -66,8 +66,6 @@ class ForgotPasswordViewModel @Inject constructor(
             return
         }
 
-        _state.value = stateValue.copy(isOTPSent = true, isCounting = true,remainingTime = 60)
-
         viewModelScope.launch {
             while (_state.value.remainingTime >= 0) {
                 delay(1000L)
@@ -91,10 +89,12 @@ class ForgotPasswordViewModel @Inject constructor(
             forgotPasswordUseCase.invoke(
                 email = stateValue.email.value
             ).collect { response ->
-                when(response) {
+                when (response) {
                     is Resource.Success -> {
                         _state.value = _state.value.copy(
                             isOTPSent = response.data,
+                            isCounting = true,
+                            remainingTime = 60,
                             isLoading = false
                         )
                     }
@@ -111,6 +111,7 @@ class ForgotPasswordViewModel @Inject constructor(
                             isLoading = true
                         )
                     }
+
                     else -> Unit
                 }
             }
@@ -146,7 +147,7 @@ class ForgotPasswordViewModel @Inject constructor(
                 otp = stateValue.otp.value,
                 newPassword = stateValue.newPassword.value
             ).collect { response ->
-                when(response) {
+                when (response) {
                     is Resource.Success -> {
                         _state.value = _state.value.copy(
                             isSuccess = response.data,
@@ -166,6 +167,7 @@ class ForgotPasswordViewModel @Inject constructor(
                             isLoading = true
                         )
                     }
+
                     else -> Unit
                 }
             }
