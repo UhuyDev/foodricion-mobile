@@ -83,7 +83,7 @@ fun SignUpScreen(
         )
     }
 
-    LaunchedEffect(state.signUpResponse) {
+    LaunchedEffect(key1 = state.signUpResponse, key2 = state.error) {
         val response = state.signUpResponse
         val error = state.error
 
