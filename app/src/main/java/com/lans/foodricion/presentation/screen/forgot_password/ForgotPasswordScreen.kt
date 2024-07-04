@@ -54,7 +54,7 @@ fun ForgotPasswordScreen(
         Alert(
             title = "Error",
             description = showAlert.second,
-            onDismissRequest = {
+            onDismissClick = {
                 showAlert = showAlert.copy(first = false)
             },
             onConfirmClick = {

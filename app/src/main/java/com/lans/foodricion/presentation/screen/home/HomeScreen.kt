@@ -1,5 +1,12 @@
 package com.lans.foodricion.presentation.screen.home
 
+import android.Manifest
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,14 +21,24 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.lans.foodricion.R
+import com.lans.foodricion.presentation.component.alert.CameraPermissionTextProvider
+import com.lans.foodricion.presentation.component.alert.PermissionAlert
 import com.lans.foodricion.presentation.component.button.CardButton
 import com.lans.foodricion.presentation.component.daily_nutrition.DailyNutrition
 import com.lans.foodricion.presentation.component.nutrition_history.NutritionHistoryItem
@@ -29,11 +46,52 @@ import com.lans.foodricion.presentation.theme.Background
 import com.lans.foodricion.presentation.theme.Black
 import com.lans.foodricion.presentation.theme.Primary
 import com.lans.foodricion.presentation.theme.PrimaryContainer
+import com.lans.foodricion.utils.getActivity
 
 @Composable
 fun HomeScreen(
+    viewModel: HomeViewModel = hiltViewModel(),
     innerPadding: PaddingValues
 ) {
+    val context = LocalContext.current
+    val state by viewModel.state
+    var showPermissionAlert by remember { mutableStateOf(false) }
+
+    val permission = Manifest.permission.CAMERA
+    val authority = stringResource(id = R.string.file_provider)
+    val cameraPermissionResultLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            if (isGranted) {
+                viewModel.getTempUri(authority = authority)
+            }
+            else {
+                showPermissionAlert = true
+            }
+        }
+    )
+
+    if (showPermissionAlert) {
+        PermissionAlert(
+            permissionTextProvider = CameraPermissionTextProvider(),
+            isPermanentlyDeclined = !shouldShowRequestPermissionRationale(
+                context.getActivity()!!,
+                permission
+            ),
+            onDismissClick = {
+                showPermissionAlert = false
+            },
+            onOkClick = {
+                showPermissionAlert = false
+                cameraPermissionResultLauncher.launch(permission)
+            },
+            onGoToAppSettingsClick = {
+                val activity = context.getActivity()
+                activity!!.openAppSettings()
+            }
+        )
+    }
+
     Column(
         modifier = Modifier
             .background(Background)
@@ -81,7 +139,9 @@ fun HomeScreen(
                 icon = painterResource(id = R.drawable.ic_scan),
                 iconColor = Primary,
                 text = stringResource(R.string.scan),
-                onClick = { }
+                onClick = {
+                    cameraPermissionResultLauncher.launch(permission)
+                }
             )
             CardButton(
                 modifier = Modifier,
@@ -163,4 +223,11 @@ fun HomeScreen(
             }
         }
     }
+}
+
+fun Activity.openAppSettings() {
+    Intent(
+        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+        Uri.fromParts("package", packageName, null)
+    ).also(::startActivity)
 }

@@ -44,15 +44,13 @@ fun SignUpScreen(
 ) {
     val context = LocalContext.current
     val state by viewModel.state
-    var showAlert by remember {
-        mutableStateOf(Pair(false, ""))
-    }
+    var showAlert by remember { mutableStateOf(Pair(false, "")) }
 
     if (showAlert.first) {
         Alert(
             title = "Error",
             description = showAlert.second,
-            onDismissRequest = {
+            onDismissClick = {
                 showAlert = showAlert.copy(first = false)
             },
             onConfirmClick = {

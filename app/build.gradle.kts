@@ -93,6 +93,7 @@ dependencies {
     implementation(libs.navigation.compose)
     implementation(libs.lifecycle.livedata.ktx)
     implementation(libs.lifecycle.viewmodel.ktx)
+    implementation(libs.accompanist.permission)
     testImplementation(libs.junit)
     androidTestImplementation(libs.test.ext)
     androidTestImplementation(libs.test.espresso.core)
