@@ -1,5 +1,6 @@
 package com.lans.foodricion.presentation.screen.signup
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -40,30 +42,10 @@ fun SignUpScreen(
     viewModel: SignUpViewModel = hiltViewModel(),
     navigateToSignIn: () -> Unit
 ) {
+    val context = LocalContext.current
     val state by viewModel.state
-    var showSuccess by remember {
-        mutableStateOf(Pair(false, ""))
-    }
     var showAlert by remember {
         mutableStateOf(Pair(false, ""))
-    }
-
-    if (showSuccess.first) {
-        Alert(
-            title = "Sign up success",
-            description = showSuccess.second,
-            onDismissRequest = {
-                showSuccess = showSuccess.copy(first = false)
-            },
-            onConfirmClick = {
-                Button(onClick = {
-                    showSuccess = showSuccess.copy(first = false)
-                    navigateToSignIn.invoke()
-                }) {
-                    Text(text = "Close")
-                }
-            }
-        )
     }
 
     if (showAlert.first) {
@@ -88,7 +70,8 @@ fun SignUpScreen(
         val error = state.error
 
         if (response) {
-            showSuccess = showSuccess.copy(first = true)
+            navigateToSignIn()
+            Toast.makeText(context, "Account created successfully", Toast.LENGTH_SHORT).show()
         }
 
         if (error.isNotBlank()) {

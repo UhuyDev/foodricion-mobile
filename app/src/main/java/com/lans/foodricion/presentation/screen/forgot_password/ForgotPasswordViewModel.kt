@@ -95,20 +95,20 @@ class ForgotPasswordViewModel @Inject constructor(
                             isOTPSent = response.data,
                             isCounting = true,
                             remainingTime = 60,
-                            isLoading = false
+                            isOTPLoading = false
                         )
                     }
 
                     is Resource.Error -> {
                         _state.value = _state.value.copy(
                             error = response.message,
-                            isLoading = false
+                            isOTPLoading = false
                         )
                     }
 
                     is Resource.Loading -> {
                         _state.value = _state.value.copy(
-                            isLoading = true
+                            isOTPLoading = true
                         )
                     }
 
@@ -151,20 +151,20 @@ class ForgotPasswordViewModel @Inject constructor(
                     is Resource.Success -> {
                         _state.value = _state.value.copy(
                             isSuccess = response.data,
-                            isLoading = false
+                            isVerifyLoading = false
                         )
                     }
 
                     is Resource.Error -> {
                         _state.value = _state.value.copy(
                             error = response.message,
-                            isLoading = false
+                            isVerifyLoading = false
                         )
                     }
 
                     is Resource.Loading -> {
                         _state.value = _state.value.copy(
-                            isLoading = true
+                            isVerifyLoading = true
                         )
                     }
 
