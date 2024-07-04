@@ -18,7 +18,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lans.foodricion.presentation.theme.Black
 import com.lans.foodricion.presentation.theme.Primary
-import com.lans.foodricion.presentation.theme.Test
 import com.lans.foodricion.presentation.theme.White
 import com.lans.foodricion.utils.formatFloat
 
@@ -55,7 +54,7 @@ fun CalorieCircularBar(
             size = Size(size.width, size.height)
         )
         drawArc(
-            color = Test,
+            color = Primary,
             startAngle = 15f,
             sweepAngle = 360f * (progressValue / maxValue).coerceIn(0f, 1f),
             useCenter = false,
@@ -70,7 +69,7 @@ fun CalorieCircularBar(
                 style = drawTextStyle,
                 topLeft = Offset(
                     x = center.x - calorieValueTextLayout.size.width / 2,
-                    y = center.y / 1.15f - calorieValueTextLayout.size.height/ 2f,
+                    y = center.y / 1.15f - calorieValueTextLayout.size.height / 2f,
                 )
 
             )

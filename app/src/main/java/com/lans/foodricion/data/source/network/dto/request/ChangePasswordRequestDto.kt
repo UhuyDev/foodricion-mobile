@@ -1,8 +1,8 @@
 package com.lans.foodricion.data.source.network.dto.request
 
-import retrofit2.http.Query
+import com.squareup.moshi.Json
 
-data class ChangePasswordRequestDto (
-    val oldPassword: String,
-    val newPassword: String
+data class ChangePasswordRequestDto(
+    @field:Json(name = "old_password") val oldPassword: String,
+    @field:Json(name = "new_password") val newPassword: String
 )
