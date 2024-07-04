@@ -17,7 +17,6 @@ import androidx.compose.ui.unit.sp
 import com.lans.foodricion.presentation.theme.Black
 import com.lans.foodricion.presentation.theme.Primary
 import com.lans.foodricion.presentation.theme.RoundedMedium
-import com.lans.foodricion.presentation.theme.Test
 import com.lans.foodricion.utils.formatFloat
 
 @Composable
@@ -26,7 +25,7 @@ fun NutritionBar(
     progressValue: Float = 0f,
     maxValue: Float = 10f,
     textColor: Color = Black,
-    filledColor: Color = Test
+    filledColor: Color = Primary
 ) {
     Column {
         Text(

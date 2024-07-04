@@ -10,9 +10,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.lans.foodricion.presentation.component.bottom_navigation.BottomNavigationBar
+import com.lans.foodricion.presentation.navigation.AuthRoute
 import com.lans.foodricion.presentation.navigation.MainRoute
 import com.lans.foodricion.presentation.navigation.graph.MainNavGraph
-import com.lans.foodricion.presentation.screen.signin.SignInScreen
 
 @Composable
 fun MainScreen(
@@ -32,7 +32,7 @@ fun MainScreen(
             BottomNavigationBar(
                 navigateToHome = { mainNavController.navigate(MainRoute.HomeScreen.route) },
                 navigateToAskBot = { mainNavController.navigate(MainRoute.AskBotScreen.route) },
-                navigateToProfile = { mainNavController.navigate(MainRoute.ProfileScreen.route) }
+                navigateToProfile = { rootNavController.navigate(AuthRoute.SignInScreen.route) }
             )
         }
     ) { paddingValues ->

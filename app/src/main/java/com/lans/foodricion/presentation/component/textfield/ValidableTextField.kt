@@ -26,6 +26,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import com.lans.foodricion.domain.model.InputWrapper
 import com.lans.foodricion.presentation.theme.Primary
 import com.lans.foodricion.presentation.theme.RoundedMedium
 import com.lans.foodricion.presentation.theme.Secondary
@@ -35,7 +36,7 @@ import com.lans.foodricion.presentation.theme.Secondary
 fun ValidableTextField(
     modifier: Modifier,
     shape: Shape = RoundedMedium,
-    input: String,
+    input: InputWrapper,
     isEnable: Boolean = true,
     isReadOnly: Boolean = false,
     isPassword: Boolean = false,
@@ -56,7 +57,7 @@ fun ValidableTextField(
 
     BasicTextField(
         modifier = modifier,
-        value = input,
+        value = input.value,
         textStyle = textStyle,
         readOnly = isReadOnly,
         singleLine = singleLine,
@@ -67,11 +68,13 @@ fun ValidableTextField(
         keyboardActions = keyboardActions,
         decorationBox = { innerTextField ->
             TextFieldDefaults.OutlinedTextFieldDecorationBox(
-                value = input,
+                value = input.value,
                 innerTextField = innerTextField,
                 enabled = isEnable,
                 label = { if (label != null) Text(label) },
                 placeholder = { if (placeholder != null) Text(placeholder) },
+                supportingText = { if (input.error != null) Text(input.error!!) },
+                isError = input.error != null,
                 singleLine = singleLine,
                 leadingIcon = leadingIcon,
                 trailingIcon = if (trailingIcon == null && isPassword) {

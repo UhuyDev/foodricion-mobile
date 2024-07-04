@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import com.lans.foodricion.presentation.navigation.NavGraph
 import com.lans.foodricion.presentation.navigation.graph.RootNavGraph
@@ -31,13 +32,15 @@ class MainActivity : ComponentActivity() {
         )
         super.onCreate(savedInstanceState)
 
+        installSplashScreen().setKeepOnScreenCondition{ viewModel.splashState }
+
         setContent {
             FoodricionTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    RootNavGraph(startDestination = NavGraph.AuthGraph)
+                    RootNavGraph(startDestination = NavGraph.MainGraph)
                 }
             }
         }

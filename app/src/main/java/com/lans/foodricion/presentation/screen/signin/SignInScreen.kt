@@ -11,8 +11,10 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -25,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.lans.foodricion.R
+import com.lans.foodricion.presentation.component.alert.Alert
 import com.lans.foodricion.presentation.component.button.GhostButton
 import com.lans.foodricion.presentation.component.button.LoadingButton
 import com.lans.foodricion.presentation.component.button.TextButton
@@ -40,14 +43,49 @@ fun SignInScreen(
     navigateToForgotPassword: () -> Unit,
     navigateToHome: () -> Unit
 ) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    val state by viewModel.state
+    var showAlert by remember {
+        mutableStateOf(Pair(false, ""))
+    }
+
+    if (showAlert.first) {
+        Alert(
+            title = "Error",
+            description = showAlert.second,
+            onDismissRequest = {
+                showAlert = showAlert.copy(first = false)
+            },
+            onConfirmClick = {
+                Button(onClick = {
+                    showAlert = showAlert.copy(first = false)
+                }) {
+                    Text(text = "Close")
+                }
+            }
+        )
+    }
+
+    LaunchedEffect(key1 = state.isLoggedIn, key2 = state.error) {
+        val response = state.isLoggedIn
+        val error = state.error
+
+        if (response) {
+            navigateToHome.invoke()
+        }
+
+        if (error.isNotBlank()) {
+            showAlert = Pair(true, error)
+            state.error = ""
+        }
+    }
 
     Column(
         modifier = Modifier
             .background(Background)
             .statusBarsPadding()
-            .navigationBarsPadding()
+            .navigationBarsPadding(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Column(
             modifier = Modifier
@@ -89,10 +127,10 @@ fun SignInScreen(
                     .padding(
                         horizontal = 24.dp
                     ),
-                input = email,
+                input = state.email,
                 label = stringResource(R.string.email),
                 onValueChange = {
-                    email = it
+                    viewModel.onEvent(SignInUIEvent.EmailChanged(it))
                 }
             )
             Spacer(
@@ -106,11 +144,11 @@ fun SignInScreen(
                     .padding(
                         horizontal = 24.dp
                     ),
-                input = password,
+                input = state.password,
                 isPassword = true,
                 label = stringResource(R.string.password),
                 onValueChange = {
-                    password = it
+                    viewModel.onEvent(SignInUIEvent.PasswordChanged(it))
                 }
             )
             Row(
@@ -131,7 +169,7 @@ fun SignInScreen(
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
                     onClick = {
-                        navigateToForgotPassword()
+                        navigateToForgotPassword.invoke()
                     }
                 )
             }
@@ -148,9 +186,9 @@ fun SignInScreen(
                         horizontal = 24.dp
                     ),
                 text = stringResource(R.string.sign_in),
-                isLoading = false,
+                isLoading = state.isLoading,
                 onClick = {
-                    navigateToHome()
+                    viewModel.onEvent(SignInUIEvent.SignInButtonClicked)
                 }
             )
             Spacer(
@@ -167,7 +205,7 @@ fun SignInScreen(
                     ),
                 text = stringResource(R.string.continue_as_guest),
                 onClick = {
-                    navigateToHome()
+                    navigateToHome.invoke()
                 }
             )
         }
@@ -181,6 +219,7 @@ fun SignInScreen(
         ) {
             Text(
                 text = stringResource(R.string.don_t_have_an_account),
+                color = Black,
                 fontSize = 14.sp,
             )
             Spacer(
@@ -194,7 +233,7 @@ fun SignInScreen(
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
                 onClick = {
-                    navigateToSignUp()
+                    navigateToSignUp.invoke()
                 }
             )
         }
