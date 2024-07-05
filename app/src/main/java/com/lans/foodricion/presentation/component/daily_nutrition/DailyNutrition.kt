@@ -2,6 +2,7 @@ package com.lans.foodricion.presentation.component.daily_nutrition
 
 import android.graphics.Paint
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -72,7 +73,6 @@ fun DailyNutrition(
                 .padding(
                     top = 16.dp,
                     start = 16.dp,
-                    end = 16.dp
                 ),
             text = stringResource(R.string.daily_nutrition),
             color = textColor,
@@ -86,7 +86,7 @@ fun DailyNutrition(
                 .padding(
                     start = 24.dp,
                     top = 16.dp,
-                    bottom = 20.dp,
+                    bottom = 24.dp,
                     end = 20.dp
                 ),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -100,10 +100,9 @@ fun DailyNutrition(
             Column(
                 modifier = Modifier
                     .padding(
-                        start = 16.dp,
-                        bottom = 8.dp
+                        start = 16.dp
                     ),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 NutritionBar(
                     text = stringResource(R.string.protein),

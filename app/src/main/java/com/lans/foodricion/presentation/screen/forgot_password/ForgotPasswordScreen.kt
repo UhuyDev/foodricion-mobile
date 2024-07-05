@@ -172,11 +172,6 @@ fun ForgotPasswordScreen(
                     viewModel.onEvent(ForgotPasswordUIEvent.NewPasswordChanged(it))
                 }
             )
-            Spacer(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(8.dp)
-            )
             Row(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -186,7 +181,7 @@ fun ForgotPasswordScreen(
                     modifier = Modifier
                         .padding(
                             start = 28.dp,
-                            top = 12.dp,
+                            top = 4.dp,
                             end = 28.dp,
                             bottom = 4.dp
                         ),

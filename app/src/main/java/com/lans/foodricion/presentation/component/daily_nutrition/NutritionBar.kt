@@ -1,5 +1,6 @@
 package com.lans.foodricion.presentation.component.daily_nutrition
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lans.foodricion.presentation.theme.Black
@@ -30,7 +32,7 @@ fun NutritionBar(
     Column {
         Text(
             color = textColor,
-            fontSize = 12.sp,
+            fontSize = 14.sp,
             text = text
         )
         Box(
@@ -39,17 +41,19 @@ fun NutritionBar(
                 .fillMaxWidth()
         ) {
             LinearProgressIndicator(
-                progress = if (maxValue != 0f) {
-                    (progressValue / maxValue).coerceIn(0f, 1f)
-                } else {
-                    0f
+                progress = {
+                    if (maxValue != 0f) {
+                        (progressValue / maxValue).coerceIn(0f, 1f)
+                    } else {
+                        0f
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(16.dp)
                     .clip(RoundedMedium),
                 color = filledColor,
-                trackColor = Color.White
+                trackColor = Color.White,
             )
 
             Text(
