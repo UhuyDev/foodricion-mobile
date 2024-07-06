@@ -30,4 +30,7 @@
     <string name="bmi">BMI</string>
     <string name="_29_jan_2024">29 Jan 2024</string>
     <string name="lorem_ipsum">Lorem ipsum</string>
+    <string name="testing_chatbot1">Hello! How can I help you today?</string>
+    <string name="testing_chatbot2">You can ask me anything about food and nutrition.</string>
+    <string name="testing_user1">Nutrition Prediction</string>
 </resources>

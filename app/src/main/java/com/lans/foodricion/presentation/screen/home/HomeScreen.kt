@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
@@ -164,4 +163,12 @@ fun HomeScreen(
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun PreviewHomeScreen() {
+    HomeScreen(
+        innerPadding = PaddingValues(0.dp)
+    )
 }
