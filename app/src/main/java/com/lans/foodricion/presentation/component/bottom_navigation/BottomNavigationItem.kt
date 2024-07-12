@@ -17,7 +17,7 @@ data class BottomNavigationItem(
             ),
             BottomNavigationItem(
                 title = "Ask Bot",
-                route = MainRoute.AskBotScreen,
+                route = MainRoute.ChatBotScreen,
                 icon = R.drawable.ic_chat
             ),
             BottomNavigationItem(

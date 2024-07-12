@@ -7,7 +7,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.lans.foodricion.presentation.navigation.MainRoute
+import com.lans.foodricion.presentation.screen.chatbot.ChatBotScreen
 import com.lans.foodricion.presentation.screen.home.HomeScreen
+import com.lans.foodricion.presentation.screen.profile.ProfileScreen
 
 @Composable
 fun MainNavGraph(
@@ -22,11 +24,11 @@ fun MainNavGraph(
         composable(route = MainRoute.HomeScreen.route) {
             HomeScreen(innerPadding = innerPadding)
         }
-        composable(route = MainRoute.AskBotScreen.route) {
-
+        composable(route = MainRoute.ChatBotScreen.route) {
+            ChatBotScreen(innerPadding = innerPadding)
         }
         composable(route = MainRoute.ProfileScreen.route) {
-
+            ProfileScreen()
         }
     }
 }

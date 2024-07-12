@@ -11,9 +11,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TextFieldDefaults.indicatorLine
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,7 +29,6 @@ import androidx.compose.ui.unit.dp
 import com.lans.foodricion.domain.model.InputWrapper
 import com.lans.foodricion.presentation.theme.Primary
 import com.lans.foodricion.presentation.theme.RoundedMedium
-import com.lans.foodricion.presentation.theme.Secondary
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,6 +39,7 @@ fun ValidableTextField(
     isEnable: Boolean = true,
     isReadOnly: Boolean = false,
     isPassword: Boolean = false,
+    isSupportiveText: Boolean = true,
     textStyle: TextStyle = LocalTextStyle.current,
     label: String? = null,
     placeholder: String? = null,
@@ -54,6 +54,13 @@ fun ValidableTextField(
     onValueChange: (value: String) -> Unit
 ) {
     var passwordVisible by rememberSaveable { mutableStateOf(true) }
+    val supportiveText: @Composable (() -> Unit)? = if (isSupportiveText) {
+        {
+            if (input.error != null) Text(input.error!!)
+        }
+    } else {
+        null
+    }
 
     BasicTextField(
         modifier = modifier,
@@ -67,15 +74,16 @@ fun ValidableTextField(
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
         decorationBox = { innerTextField ->
-            TextFieldDefaults.OutlinedTextFieldDecorationBox(
+            OutlinedTextFieldDefaults.DecorationBox(
                 value = input.value,
                 innerTextField = innerTextField,
                 enabled = isEnable,
+                singleLine = singleLine,
+                visualTransformation = visualTransformation,
+                interactionSource = interactionSource,
+                isError = input.error != null,
                 label = { if (label != null) Text(label) },
                 placeholder = { if (placeholder != null) Text(placeholder) },
-                supportingText = { if (input.error != null) Text(input.error!!) },
-                isError = input.error != null,
-                singleLine = singleLine,
                 leadingIcon = leadingIcon,
                 trailingIcon = if (trailingIcon == null && isPassword) {
                     {
@@ -87,22 +95,23 @@ fun ValidableTextField(
                         }
                     }
                 } else trailingIcon,
-                interactionSource = interactionSource,
-                visualTransformation = visualTransformation,
+                supportingText = supportiveText,
+                colors = OutlinedTextFieldDefaults.colors(),
+                contentPadding = OutlinedTextFieldDefaults.contentPadding(),
                 container = {
-                    TextFieldDefaults.OutlinedBorderContainerBox(
+                    OutlinedTextFieldDefaults.ContainerBox(
                         enabled = isEnable,
                         isError = false,
                         interactionSource = interactionSource,
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                        colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Primary,
                             unfocusedBorderColor = Primary
                         ),
                         shape = shape,
                         focusedBorderThickness = 2.dp,
-                        unfocusedBorderThickness = 2.dp
+                        unfocusedBorderThickness = 2.dp,
                     )
-                }
+                },
             )
         },
         onValueChange = onValueChange
