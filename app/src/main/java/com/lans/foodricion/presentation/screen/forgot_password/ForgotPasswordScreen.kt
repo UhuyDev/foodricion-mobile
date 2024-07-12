@@ -1,5 +1,6 @@
 package com.lans.foodricion.presentation.screen.forgot_password
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -42,10 +44,8 @@ fun ForgotPasswordScreen(
     viewModel: ForgotPasswordViewModel = hiltViewModel(),
     navigateToSignIn: () -> Unit
 ) {
+    val context = LocalContext.current
     val state by viewModel.state
-    var showSuccess by remember {
-        mutableStateOf(Pair(false, ""))
-    }
     var showAlert by remember {
         mutableStateOf(Pair(false, ""))
     }
@@ -54,7 +54,7 @@ fun ForgotPasswordScreen(
         Alert(
             title = "Error",
             description = showAlert.second,
-            onDismissRequest = {
+            onDismissClick = {
                 showAlert = showAlert.copy(first = false)
             },
             onConfirmClick = {
@@ -67,32 +67,16 @@ fun ForgotPasswordScreen(
         )
     }
 
-    if (showSuccess.first) {
-        Alert(
-            title = "OTP code sent",
-            description = showSuccess.second,
-            onDismissRequest = {
-                showSuccess = showSuccess.copy(first = false)
-            },
-            onConfirmClick = {
-                Button(onClick = {
-                    showSuccess = showSuccess.copy(first = false)
-                }) {
-                    Text(text = "Close")
-                }
-            }
-        )
-    }
-
     LaunchedEffect(key1 = state.remainingTime, key2 = state.error, key3 = state.isSuccess) {
         if (state.isOTPSent) {
-            showSuccess = showSuccess.copy(first = true, second = "OTP code sent")
+            Toast.makeText(context, "OTP code sent", Toast.LENGTH_SHORT).show()
             state.isOTPSent = false
         }
 
         if (state.isSuccess) {
-            showSuccess = showSuccess.copy(first = true, second = "Reset password success")
+            Toast.makeText(context, "Reset password success", Toast.LENGTH_SHORT).show()
             state.isSuccess = false
+            navigateToSignIn.invoke()
         }
 
         if (state.error.isNotBlank()) {
@@ -188,11 +172,6 @@ fun ForgotPasswordScreen(
                     viewModel.onEvent(ForgotPasswordUIEvent.NewPasswordChanged(it))
                 }
             )
-            Spacer(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(8.dp)
-            )
             Row(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -202,13 +181,13 @@ fun ForgotPasswordScreen(
                     modifier = Modifier
                         .padding(
                             start = 28.dp,
-                            top = 12.dp,
+                            top = 4.dp,
                             end = 28.dp,
                             bottom = 4.dp
                         ),
                     text = if (state.isCounting) {
                         "Resend Code in ${state.remainingTime} s"
-                    } else if (state.isLoading) {
+                    } else if (state.isOTPLoading) {
                         stringResource(R.string.sending)
                     } else {
                         stringResource(
@@ -216,7 +195,7 @@ fun ForgotPasswordScreen(
                         )
                     },
                     isEnable = !state.isOTPSent,
-                    color = if (state.isCounting || state.isLoading) Color.Gray else Secondary,
+                    color = if (state.isCounting || state.isOTPLoading) Color.Gray else Secondary,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.End,
@@ -238,7 +217,7 @@ fun ForgotPasswordScreen(
                         horizontal = 24.dp
                     ),
                 text = stringResource(R.string.submit),
-                isLoading = false,
+                isLoading = state.isVerifyLoading,
                 onClick = {
                     viewModel.onEvent(ForgotPasswordUIEvent.SubmitButtonClicked)
                 }

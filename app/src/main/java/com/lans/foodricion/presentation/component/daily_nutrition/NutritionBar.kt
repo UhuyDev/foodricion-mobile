@@ -30,7 +30,7 @@ fun NutritionBar(
     Column {
         Text(
             color = textColor,
-            fontSize = 12.sp,
+            fontSize = 14.sp,
             text = text
         )
         Box(
@@ -39,17 +39,19 @@ fun NutritionBar(
                 .fillMaxWidth()
         ) {
             LinearProgressIndicator(
-                progress = if (maxValue != 0f) {
-                    (progressValue / maxValue).coerceIn(0f, 1f)
-                } else {
-                    0f
+                progress = {
+                    if (maxValue != 0f) {
+                        (progressValue / maxValue).coerceIn(0f, 1f)
+                    } else {
+                        0f
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(16.dp)
                     .clip(RoundedMedium),
                 color = filledColor,
-                trackColor = Color.White
+                trackColor = Color.White,
             )
 
             Text(

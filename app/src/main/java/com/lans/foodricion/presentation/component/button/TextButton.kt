@@ -19,6 +19,7 @@ fun TextButton(
     fontSize: TextUnit,
     fontWeight: FontWeight = FontWeight.Normal,
     textAlign: TextAlign = TextAlign.Start,
+    lineHeight: TextUnit = TextUnit.Unspecified,
     onClick: () -> Unit
 ) {
     Text(
@@ -32,6 +33,7 @@ fun TextButton(
         color = if (isEnable) color else Color.Gray,
         fontSize = fontSize,
         fontWeight = fontWeight,
-        textAlign = textAlign
+        textAlign = textAlign,
+        lineHeight = lineHeight
     )
 }
