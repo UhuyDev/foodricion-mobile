@@ -2,92 +2,77 @@ package com.lans.foodricion.data.tensorflow
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.util.Log
 import android.view.Surface
 import com.lans.foodricion.domain.model.Classification
 import com.lans.foodricion.domain.tensorflow.FoodClassifier
+import com.lans.foodricion.ml.FoodModel
 import org.tensorflow.lite.DataType
+import org.tensorflow.lite.Interpreter
+import org.tensorflow.lite.support.common.FileUtil
 import org.tensorflow.lite.support.common.ops.NormalizeOp
 import org.tensorflow.lite.support.image.ImageProcessor
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.support.image.ops.ResizeOp
+import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 import org.tensorflow.lite.task.core.BaseOptions
 import org.tensorflow.lite.task.core.vision.ImageProcessingOptions
 import org.tensorflow.lite.task.vision.classifier.ImageClassifier
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
+import kotlin.math.log
 
 class TfLiteClassifier(
     val context: Context
 ) : FoodClassifier {
-    private var imageClassifier: ImageClassifier? = null
-    private val threshold: Float = 0.5f
-    private val numThreads: Int = 2
-    private val maxResults: Int = 3
+    private val modelPath = "foodModel.tflite"
+    private val labelPath = "labels.txt"
 
-    private fun setupClassifier() {
-        val baseOptions = BaseOptions.builder()
-            .setNumThreads(numThreads)
-            .build()
+    private lateinit var interpreter: Interpreter
+    private lateinit var labels: List<String>
 
-        val optionsBuilder = ImageClassifier
-            .ImageClassifierOptions.builder()
-            .setScoreThreshold(threshold)
-            .setMaxResults(maxResults)
-            .setBaseOptions(baseOptions)
-
-        val modelName = "foodModel.tflite"
-
-        try {
-            imageClassifier = ImageClassifier.createFromFileAndOptions(
-                context,
-                modelName,
-                optionsBuilder.build()
-            )
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+    private fun setup() {
+        val model = FileUtil.loadMappedFile(context, modelPath)
+        interpreter =   Interpreter(model)
+        labels = FileUtil.loadLabels(context, labelPath)
     }
 
     override fun classify(bitmap: Bitmap, rotation: Int): List<Classification> {
-        if (imageClassifier == null) {
-            setupClassifier()
+        setup()
+
+        val inputShape = interpreter.getInputTensor(0).shape()
+        val inputWidth = inputShape[1]
+        val inputHeight = inputShape[2]
+        val inputChannel = inputShape[3]
+        val modelInputSize = 4 * inputWidth * inputHeight * inputChannel
+
+        val resizedImage =
+            Bitmap.createScaledBitmap(bitmap, inputWidth, inputHeight, true)
+        val byteBuffer = ByteBuffer.allocateDirect(modelInputSize)
+        byteBuffer.order(ByteOrder.nativeOrder())
+
+        val pixels = IntArray(inputWidth * inputHeight)
+        resizedImage.getPixels(pixels, 0, resizedImage.width, 0, 0, resizedImage.width, resizedImage.height)
+        var pixel = 0
+        for (i in 0 until 200) {
+            for (j in 0 until 150) {
+                val value = pixels[pixel++]
+                byteBuffer.putFloat((value shr 16 and 0xFF) / 127.5f)
+                byteBuffer.putFloat((value shr 8 and 0xFF) / 127.5f)
+                byteBuffer.putFloat((value and 0xFF) / 127.5f)
+            }
         }
 
-        val tensorImage = TensorImage(DataType.FLOAT32)
-        tensorImage.load(bitmap)
+        val output = Array(1) { FloatArray(labels.size) }
+        interpreter.run(byteBuffer, output)
 
-        val imageProcessor = ImageProcessor.Builder()
-            .add(ResizeOp(224, 224, ResizeOp.ResizeMethod.BILINEAR))
-            .add(NormalizeOp(0f, 1f))
-            .build()
-
-        val processedTensorImage = imageProcessor.process(tensorImage)
-        val imageProcessingOptions = ImageProcessingOptions.builder()
-            .setOrientation(getOrientationFromRotation(0))
-            .build()
-
-        val results = imageClassifier?.classify(processedTensorImage, imageProcessingOptions)
-        return results?.flatMap { classifications ->
-            classifications.categories.map { category ->
+        return output.flatMap {
+            it.mapIndexed { index, fl ->
                 Classification(
-                    name = category.displayName,
-                    score = category.score
+                    name = labels[index],
+                    score = fl
                 )
             }
-        }?.distinctBy { it.name } ?: emptyList()
-    }
-
-    private fun getOrientationFromRotation(rotation: Int): ImageProcessingOptions.Orientation {
-        return when (rotation) {
-            Surface.ROTATION_270 ->
-                ImageProcessingOptions.Orientation.BOTTOM_RIGHT
-
-            Surface.ROTATION_180 ->
-                ImageProcessingOptions.Orientation.RIGHT_BOTTOM
-
-            Surface.ROTATION_90 ->
-                ImageProcessingOptions.Orientation.TOP_LEFT
-
-            else ->
-                ImageProcessingOptions.Orientation.RIGHT_TOP
-        }
+        }.sortedByDescending { it.score }
     }
 }

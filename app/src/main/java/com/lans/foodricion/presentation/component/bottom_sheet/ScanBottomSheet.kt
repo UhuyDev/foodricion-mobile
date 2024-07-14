@@ -14,10 +14,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lans.foodricion.presentation.component.button.TextButton
 import com.lans.foodricion.presentation.theme.Black
+import com.lans.foodricion.presentation.theme.White
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BottomSheet(
+fun ScanBottomSheet(
     modifier: Modifier,
     onTakePhotoClick: () -> Unit,
     onPhotoGalleryClick: () -> Unit,
@@ -25,6 +26,8 @@ fun BottomSheet(
 ) {
     ModalBottomSheet(
         modifier = modifier,
+        containerColor = White,
+        contentColor = Black,
         onDismissRequest = onDismissClick,
     ) {
         Column(
