@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.lans.foodricion.presentation.theme.Primary
 import com.lans.foodricion.presentation.theme.RoundedMedium
 import com.lans.foodricion.presentation.theme.White
@@ -39,7 +40,10 @@ fun LoadingButton(
                 color = contentColor
             )
         } else {
-            Text(text)
+            Text(
+                text = text,
+                fontSize = 16.sp
+            )
         }
     }
 }

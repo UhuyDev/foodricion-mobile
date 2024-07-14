@@ -13,6 +13,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,7 +27,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.lans.foodricion.domain.model.InputWrapper
-import com.lans.foodricion.presentation.theme.Neutral
 import com.lans.foodricion.presentation.theme.Primary
 import com.lans.foodricion.presentation.theme.RoundedMedium
 
@@ -39,6 +39,7 @@ fun ValidableTextField(
     isEnable: Boolean = true,
     isReadOnly: Boolean = false,
     isPassword: Boolean = false,
+    isSupportiveText: Boolean = true,
     textStyle: TextStyle = LocalTextStyle.current,
     label: String? = null,
     placeholder: String? = null,
@@ -53,6 +54,13 @@ fun ValidableTextField(
     onValueChange: (value: String) -> Unit
 ) {
     var passwordVisible by rememberSaveable { mutableStateOf(true) }
+    val supportiveText: @Composable (() -> Unit)? = if (isSupportiveText) {
+        {
+            if (input.error != null) Text(input.error!!)
+        }
+    } else {
+        null
+    }
 
     BasicTextField(
         modifier = modifier,
@@ -82,17 +90,13 @@ fun ValidableTextField(
                         IconButton(onClick = { passwordVisible = !passwordVisible }) {
                             Icon(
                                 imageVector = if (passwordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
-                                tint = Neutral,
                                 contentDescription = if (passwordVisible) "Hide password" else "Show password"
                             )
                         }
                     }
                 } else trailingIcon,
-                supportingText = { if (input.error != null) Text(input.error!!) },
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedLabelColor = Primary,
-                    unfocusedLabelColor = Neutral
-                ),
+                supportingText = supportiveText,
+                colors = OutlinedTextFieldDefaults.colors(),
                 contentPadding = OutlinedTextFieldDefaults.contentPadding(),
                 container = {
                     OutlinedTextFieldDefaults.ContainerBox(
@@ -101,7 +105,7 @@ fun ValidableTextField(
                         interactionSource = interactionSource,
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Primary,
-                            unfocusedBorderColor = Neutral
+                            unfocusedBorderColor = Primary
                         ),
                         shape = shape,
                         focusedBorderThickness = 2.dp,

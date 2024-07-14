@@ -3,6 +3,7 @@ package com.lans.foodricion.presentation.theme
 import androidx.compose.ui.graphics.Color
 
 val Primary = Color(0xFF39B19B)
+val PrimaryDark = Color(0xFF137160)
 val PrimaryContainer = Color(0xFFD0E6E2)
 val Secondary = Color(0xFF758ED1)
 val SecondaryContainer = Color(0xFFCED2DE)

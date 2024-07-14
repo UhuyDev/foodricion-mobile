@@ -60,8 +60,8 @@ fun BottomNavigationBar(
                                 }
                             }
 
-                            is MainRoute.AskBotScreen -> {
-                                if (selectedItem != MainRoute.AskBotScreen) {
+                            is MainRoute.ChatBotScreen -> {
+                                if (selectedItem != MainRoute.ChatBotScreen) {
                                     navigateToAskBot()
                                 }
                             }
