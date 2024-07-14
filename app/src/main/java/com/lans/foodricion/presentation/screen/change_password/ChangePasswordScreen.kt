@@ -27,6 +27,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.lans.foodricion.R
 import com.lans.foodricion.domain.model.InputWrapper
 import com.lans.foodricion.presentation.component.button.GhostButton
@@ -41,8 +42,8 @@ import com.lans.foodricion.presentation.theme.Secondary
 
 @Composable
 fun ChangePasswordScreen(
-//    viewModel: ChangePasswordViewModel = hiltViewModel(),
-//    innerPadding: PaddingValues
+    viewModel: ChangePasswordViewModel = hiltViewModel(),
+    navigateToProfile: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -59,7 +60,9 @@ fun ChangePasswordScreen(
             Icon(
                 modifier = Modifier
                     .size(48.dp)
-                    .clickable { },
+                    .clickable {
+                        navigateToProfile.invoke()
+                    },
                 painter = painterResource(id = R.drawable.ic_back),
                 tint = Black,
                 contentDescription = stringResource(id = R.string.content_description)
@@ -113,10 +116,4 @@ fun ChangePasswordScreen(
             onClick = { }
         )
     }
-}
-
-@Preview
-@Composable
-fun ChangePasswordScreenPreview() {
-    ChangePasswordScreen()
 }

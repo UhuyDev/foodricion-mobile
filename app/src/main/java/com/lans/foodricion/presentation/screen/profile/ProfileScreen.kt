@@ -4,7 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -41,7 +40,10 @@ import com.lans.foodricion.presentation.theme.White
 @Composable
 fun ProfileScreen(
     viewModel: ProfileViewModel = hiltViewModel(),
-    innerPadding: PaddingValues
+    navigateToSignIn: () -> Unit,
+    navigateToSignUp: () -> Unit,
+    navigateToChangePassword: () -> Unit,
+    navigateToSignOut: () -> Unit
 ) {
     val isLoggedIn = false
     Column(
@@ -138,19 +140,25 @@ fun ProfileScreen(
                 ProfileButton(
                     modifier = Modifier,
                     text = stringResource(id = R.string.sign_in),
-                    onClick = {}
+                    onClick = {
+                        navigateToSignIn.invoke()
+                    }
                 )
                 ProfileButton(
                     modifier = Modifier,
-                    text = "Sign Up",
-                    onClick = {}
+                    text = stringResource(id = R.string.sign_up),
+                    onClick = {
+                        navigateToSignUp.invoke()
+                    }
                 )
             }
 
             ProfileButton(
                 modifier = Modifier,
                 text = stringResource(R.string.change_password),
-                onClick = {}
+                onClick = {
+                    navigateToChangePassword.invoke()
+                }
             )
             ProfileButton(
                 modifier = Modifier,
@@ -188,7 +196,9 @@ fun ProfileScreen(
                     modifier = Modifier,
                     text = stringResource(R.string.sign_out),
                     color = Danger,
-                    onClick = {}
+                    onClick = {
+                        navigateToSignOut.invoke()
+                    }
                 )
             }
         }

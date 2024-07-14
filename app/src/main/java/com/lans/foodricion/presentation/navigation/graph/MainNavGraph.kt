@@ -8,7 +8,10 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.lans.foodricion.presentation.component.keyboard_aware.KeyboardAware
+import com.lans.foodricion.presentation.navigation.AuthRoute
 import com.lans.foodricion.presentation.navigation.MainRoute
+import com.lans.foodricion.presentation.screen.change_password.ChangePasswordScreen
 import com.lans.foodricion.presentation.screen.chatbot.ChatBotScreen
 import com.lans.foodricion.presentation.screen.home.HomeScreen
 import com.lans.foodricion.presentation.screen.profile.ProfileScreen
@@ -17,7 +20,6 @@ import com.lans.foodricion.presentation.screen.profile.ProfileScreen
 fun MainNavGraph(
     rootNavController: NavController,
     mainNavController: NavHostController,
-    lastRoute: MainRoute,
     innerPadding: PaddingValues
 ) {
     NavHost(
@@ -30,48 +32,28 @@ fun MainNavGraph(
         composable(
             route = MainRoute.ChatBotScreen.route,
             enterTransition = {
-                when (initialState.destination.route) {
-                    "details" ->
-                        slideIntoContainer(
-                            AnimatedContentTransitionScope.SlideDirection.Left,
-                            animationSpec = tween(700)
-                        )
-
-                    else -> null
-                }
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Up,
+                    animationSpec = tween(400)
+                )
             },
             exitTransition = {
-                when (targetState.destination.route) {
-                    "details" ->
-                        slideOutOfContainer(
-                            AnimatedContentTransitionScope.SlideDirection.Left,
-                            animationSpec = tween(700)
-                        )
-
-                    else -> null
-                }
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Down,
+                    animationSpec = tween(500)
+                )
             },
             popEnterTransition = {
-                when (initialState.destination.route) {
-                    "details" ->
-                        slideIntoContainer(
-                            AnimatedContentTransitionScope.SlideDirection.Right,
-                            animationSpec = tween(700)
-                        )
-
-                    else -> null
-                }
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Up,
+                    animationSpec = tween(400)
+                )
             },
             popExitTransition = {
-                when (targetState.destination.route) {
-                    "details" ->
-                        slideOutOfContainer(
-                            AnimatedContentTransitionScope.SlideDirection.Right,
-                            animationSpec = tween(700)
-                        )
-
-                    else -> null
-                }
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Down,
+                    animationSpec = tween(500)
+                )
             }
         ) {
             ChatBotScreen(
@@ -82,7 +64,39 @@ fun MainNavGraph(
             )
         }
         composable(route = MainRoute.ProfileScreen.route) {
-            ProfileScreen(innerPadding = innerPadding)
+            KeyboardAware {
+                ProfileScreen(
+                    navigateToSignIn = {
+                        rootNavController.navigate(route = AuthRoute.SignInScreen.route) {
+                            popUpTo(route = MainRoute.ProfileScreen.route)
+                        }
+                    },
+                    navigateToSignUp = {
+                        rootNavController.navigate(route = AuthRoute.SignUpScreen.route) {
+                            popUpTo(route = MainRoute.ProfileScreen.route)
+                        }
+                    },
+                    navigateToChangePassword = {
+                        mainNavController.navigate(route = MainRoute.ChangePasswordScreen.route) {
+                            popUpTo(route = MainRoute.ChangePasswordScreen.route)
+                        }
+                    },
+                    navigateToSignOut = {
+                        rootNavController.navigate(route = AuthRoute.SignInScreen.route) {
+                            popUpTo(route = MainRoute.ProfileScreen.route) {
+                                inclusive = true
+                            }
+                        }
+                    }
+                )
+            }
+        }
+        composable(route = MainRoute.ChangePasswordScreen.route) {
+            ChangePasswordScreen(
+                navigateToProfile = {
+                    mainNavController.navigateUp()
+                }
+            )
         }
     }
 }

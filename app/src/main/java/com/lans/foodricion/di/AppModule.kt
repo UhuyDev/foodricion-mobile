@@ -3,6 +3,7 @@ package com.lans.foodricion.di
 import android.content.Context
 import com.lans.foodricion.common.Constant.BASE_URL
 import com.lans.foodricion.data.repository.AuthRepository
+import com.lans.foodricion.data.repository.ChatbotRepository
 import com.lans.foodricion.data.repository.UserRepository
 import com.lans.foodricion.data.source.local.DataStoreManager
 import com.lans.foodricion.data.source.network.AuthAuthenticator
@@ -10,8 +11,10 @@ import com.lans.foodricion.data.source.network.AuthInterceptor
 import com.lans.foodricion.data.source.network.api.FoodricionApi
 import com.lans.foodricion.data.tensorflow.TfLiteClassifier
 import com.lans.foodricion.domain.interactor.ForgotPasswordInteractor
+import com.lans.foodricion.domain.interactor.GetChatbotHistoryInteractor
 import com.lans.foodricion.domain.interactor.GetImageTempUriInteractor
 import com.lans.foodricion.domain.interactor.IsAuthenticatedInteractor
+import com.lans.foodricion.domain.interactor.SendChatBotMessageInteractor
 import com.lans.foodricion.domain.interactor.SignInInteractor
 import com.lans.foodricion.domain.interactor.SignUpInteractor
 import com.lans.foodricion.domain.interactor.StoreSessionInteractor
@@ -23,11 +26,14 @@ import com.lans.foodricion.domain.interactor.validator.ValidateOTPInteractor
 import com.lans.foodricion.domain.interactor.validator.ValidatePasswordInteractor
 import com.lans.foodricion.domain.interactor.validator.ValidatorInteractor
 import com.lans.foodricion.domain.repository.IAuthRepository
+import com.lans.foodricion.domain.repository.IChatbotRepository
 import com.lans.foodricion.domain.repository.IUserRepository
 import com.lans.foodricion.domain.tensorflow.FoodClassifier
 import com.lans.foodricion.domain.usecase.ForgotPasswordUseCase
+import com.lans.foodricion.domain.usecase.GetChatbotHistoryUseCase
 import com.lans.foodricion.domain.usecase.GetImageTempUriUseCase
 import com.lans.foodricion.domain.usecase.IsAuthenticatedUseCase
+import com.lans.foodricion.domain.usecase.SendChatbotMessageUseCase
 import com.lans.foodricion.domain.usecase.SignInUseCase
 import com.lans.foodricion.domain.usecase.SignUpUseCase
 import com.lans.foodricion.domain.usecase.StoreSessionUseCase
@@ -116,6 +122,14 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideChatbotRepository(
+        api: FoodricionApi
+    ): IChatbotRepository {
+        return ChatbotRepository(api)
+    }
+
+    @Provides
+    @Singleton
     fun provideSignInUseCase(authRepository: IAuthRepository): SignInUseCase {
         return SignInInteractor(authRepository)
     }
@@ -154,6 +168,18 @@ object AppModule {
     @Singleton
     fun provideGetImageTempUriUseCase(@ApplicationContext context: Context): GetImageTempUriUseCase {
         return GetImageTempUriInteractor(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSendChatbotMessageUseCase(chatbotRepository: ChatbotRepository): SendChatbotMessageUseCase {
+        return SendChatBotMessageInteractor(chatbotRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetChatbotHistoryUseCase(chatbotRepository: ChatbotRepository): GetChatbotHistoryUseCase {
+        return GetChatbotHistoryInteractor(chatbotRepository)
     }
 
     @Provides

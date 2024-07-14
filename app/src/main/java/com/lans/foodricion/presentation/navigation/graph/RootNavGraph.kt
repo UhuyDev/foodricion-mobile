@@ -10,7 +10,8 @@ import com.lans.foodricion.presentation.screen.profile.ProfileScreen
 
 @Composable
 fun RootNavGraph(
-    startDestination: String
+    startDestination: String,
+    isAuthenticated: Boolean
 ) {
     val navController = rememberNavController()
     NavHost(
@@ -20,7 +21,10 @@ fun RootNavGraph(
     ) {
         authNavGraph(navController = navController)
         composable(route = NavGraph.MainGraph) {
-            MainScreen(rootNavController = navController)
+            MainScreen(
+                rootNavController = navController,
+                isAuthenticated = isAuthenticated
+            )
         }
     }
 }

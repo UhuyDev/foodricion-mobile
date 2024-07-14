@@ -13,7 +13,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,6 +26,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.lans.foodricion.domain.model.InputWrapper
+import com.lans.foodricion.presentation.theme.Neutral
 import com.lans.foodricion.presentation.theme.Primary
 import com.lans.foodricion.presentation.theme.RoundedMedium
 
@@ -90,13 +90,17 @@ fun ValidableTextField(
                         IconButton(onClick = { passwordVisible = !passwordVisible }) {
                             Icon(
                                 imageVector = if (passwordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
+                                tint = Neutral,
                                 contentDescription = if (passwordVisible) "Hide password" else "Show password"
                             )
                         }
                     }
                 } else trailingIcon,
                 supportingText = supportiveText,
-                colors = OutlinedTextFieldDefaults.colors(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedLabelColor = Primary,
+                    unfocusedLabelColor = Neutral
+                ),
                 contentPadding = OutlinedTextFieldDefaults.contentPadding(),
                 container = {
                     OutlinedTextFieldDefaults.ContainerBox(
@@ -105,7 +109,7 @@ fun ValidableTextField(
                         interactionSource = interactionSource,
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Primary,
-                            unfocusedBorderColor = Primary
+                            unfocusedBorderColor = Neutral
                         ),
                         shape = shape,
                         focusedBorderThickness = 2.dp,

@@ -19,7 +19,8 @@ import com.lans.foodricion.presentation.navigation.graph.MainNavGraph
 
 @Composable
 fun MainScreen(
-    rootNavController: NavHostController
+    rootNavController: NavHostController,
+    isAuthenticated: Boolean,
 ) {
     val mainNavController = rememberNavController()
     val activity = LocalContext.current as Activity
@@ -65,7 +66,6 @@ fun MainScreen(
         MainNavGraph(
             rootNavController = rootNavController,
             mainNavController = mainNavController,
-            lastRoute = lastSelectedRoute,
             innerPadding = paddingValues
         )
     }

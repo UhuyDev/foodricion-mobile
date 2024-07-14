@@ -26,12 +26,14 @@ fun NavGraphBuilder.authNavGraph(
                 },
                 navigateToForgotPassword = {
                     navController.navigate(route = AuthRoute.ForgotScreen.route) {
-                        popUpTo(route = AuthRoute.ForgotScreen.route)
+                        popUpTo(route = AuthRoute.SignInScreen.route)
                     }
                 },
                 navigateToHome = {
                     navController.navigate(route = NavGraph.MainGraph) {
-                        popUpTo(route = AuthRoute.SignInScreen.route)
+                        popUpTo(route = AuthRoute.SignInScreen.route) {
+                            inclusive = true
+                        }
                     }
                 }
             )

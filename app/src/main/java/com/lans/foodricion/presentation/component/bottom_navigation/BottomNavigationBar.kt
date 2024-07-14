@@ -33,7 +33,6 @@ fun BottomNavigationBar(
 ) {
     BottomAppBar(
         modifier = Modifier
-            .height(100.dp)
             .topBorder(2.dp, Black),
         containerColor = Background
     ) {
@@ -63,6 +62,8 @@ fun BottomNavigationBar(
                                     navigateToProfile()
                                 }
                             }
+
+                            else -> Unit
                         }
                         if(item.route != MainRoute.ChatBotScreen) {
                             onItemSelected(item.route)

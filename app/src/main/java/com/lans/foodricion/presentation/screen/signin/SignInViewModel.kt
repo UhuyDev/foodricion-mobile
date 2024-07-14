@@ -41,7 +41,7 @@ class SignInViewModel @Inject constructor(
                 )
             }
 
-            SignInUIEvent.SignInButtonClicked -> {
+            is SignInUIEvent.SignInButtonClicked -> {
                 signin()
             }
         }
