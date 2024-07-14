@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,12 +25,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.lans.foodricion.R
 import com.lans.foodricion.presentation.component.profile_button_item.ProfileButton
 import com.lans.foodricion.presentation.theme.Background
+import com.lans.foodricion.presentation.theme.Black
 import com.lans.foodricion.presentation.theme.Danger
 import com.lans.foodricion.presentation.theme.Primary
 import com.lans.foodricion.presentation.theme.PrimaryDark
@@ -37,7 +39,10 @@ import com.lans.foodricion.presentation.theme.RoundedMedium
 import com.lans.foodricion.presentation.theme.White
 
 @Composable
-fun ProfileScreen() {
+fun ProfileScreen(
+    viewModel: ProfileViewModel = hiltViewModel(),
+    innerPadding: PaddingValues
+) {
     val isLoggedIn = false
     Column(
         modifier = Modifier
@@ -53,8 +58,10 @@ fun ProfileScreen() {
                     bottom = 24.dp
                 ),
             text = stringResource(R.string.profile),
+            color = Black,
             textAlign = TextAlign.Center,
-            fontSize = 24.sp
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold
         )
 
         if (isLoggedIn) {
@@ -186,10 +193,4 @@ fun ProfileScreen() {
             }
         }
     }
-}
-
-@Preview
-@Composable
-fun PreviewProfileScreen() {
-    ProfileScreen()
 }

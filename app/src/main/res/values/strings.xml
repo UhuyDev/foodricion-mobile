@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Foodricion</string>
+    <string name="file_provider">com.lans.foodricion.domain.interactor.fileprovider</string>
     <string name="content_description">Content Description</string>
     <string name="sign_in">Sign In</string>
     <string name="hello_welcome_back">Hello, welcome back!</string>
@@ -47,4 +48,9 @@
     <string name="name_example">Example Name</string>
     <string name="food_buddy">Food Buddy</string>
     <string name="your_personal_assistant">Your Personal Assistant</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="update">Update</string>
+    <string name="delete">Delete</string>
+    <string name="this_action_cannot_be_undone_and_you_will_lose_all_your_data_and_history_permanently">This action cannot be undone and you will lose all your data and history permanently.</string>
+    <string name="delete_my_account">Delete My Account</string>
 </resources>

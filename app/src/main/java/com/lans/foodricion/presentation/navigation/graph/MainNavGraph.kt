@@ -28,7 +28,7 @@ fun MainNavGraph(
             ChatBotScreen(innerPadding = innerPadding)
         }
         composable(route = MainRoute.ProfileScreen.route) {
-            ProfileScreen()
+            ProfileScreen(innerPadding = innerPadding)
         }
     }
 }
