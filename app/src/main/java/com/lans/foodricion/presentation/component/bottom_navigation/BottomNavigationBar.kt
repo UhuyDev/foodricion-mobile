@@ -10,13 +10,8 @@ import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -26,15 +21,15 @@ import com.lans.foodricion.presentation.theme.Background
 import com.lans.foodricion.presentation.theme.Black
 import com.lans.foodricion.presentation.theme.Neutral
 import com.lans.foodricion.presentation.theme.Primary
-import com.lans.foodricion.presentation.theme.PrimaryContainer
-import com.lans.foodricion.presentation.theme.White
 import com.lans.foodricion.utils.topBorder
 
 @Composable
 fun BottomNavigationBar(
+    selectedItem: MainRoute,
     navigateToHome: () -> Unit,
     navigateToAskBot: () -> Unit,
-    navigateToProfile: () -> Unit
+    navigateToProfile: () -> Unit,
+    onItemSelected: (MainRoute) -> Unit
 ) {
     BottomAppBar(
         modifier = Modifier
@@ -42,9 +37,6 @@ fun BottomNavigationBar(
             .topBorder(2.dp, Black),
         containerColor = Background
     ) {
-        var selectedItem by remember {
-            mutableStateOf<MainRoute>(MainRoute.HomeScreen)
-        }
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
@@ -72,7 +64,9 @@ fun BottomNavigationBar(
                                 }
                             }
                         }
-                        selectedItem = item.route
+                        if(item.route != MainRoute.ChatBotScreen) {
+                            onItemSelected(item.route)
+                        }
                     }
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {

@@ -1,6 +1,7 @@
 package com.lans.foodricion.presentation.screen.home
 
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -26,6 +27,7 @@ class HomeViewModel @Inject constructor(
     }
 
     fun classify(bitmap: Bitmap, rotation: Int): List<Classification> {
+        Log.d("CLASSIFIER", foodClassifier.classify(bitmap, rotation).toString())
         return foodClassifier.classify(bitmap, rotation)
     }
 }

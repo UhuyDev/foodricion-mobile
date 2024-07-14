@@ -128,9 +128,8 @@ fun HomeScreen(
                     painter = rememberAsyncImagePainter(state.tempUri),
                     contentDescription = null
                 )
-                state.classifierResult.forEach {
-                    Text(text = it.name)
-                }
+
+                Text(text = state.classifierResult[0].name)
             }
         }
     }

@@ -15,6 +15,7 @@ import com.lans.foodricion.presentation.screen.profile.ProfileScreen
 fun MainNavGraph(
     rootNavController: NavController,
     mainNavController: NavHostController,
+    lastRoute: MainRoute,
     innerPadding: PaddingValues
 ) {
     NavHost(
@@ -25,7 +26,12 @@ fun MainNavGraph(
             HomeScreen(innerPadding = innerPadding)
         }
         composable(route = MainRoute.ChatBotScreen.route) {
-            ChatBotScreen(innerPadding = innerPadding)
+            ChatBotScreen(
+                innerPadding = innerPadding,
+                navigateBack = {
+                    mainNavController.navigateUp()
+                }
+            )
         }
         composable(route = MainRoute.ProfileScreen.route) {
             ProfileScreen(innerPadding = innerPadding)

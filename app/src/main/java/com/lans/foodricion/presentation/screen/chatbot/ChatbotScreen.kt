@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -27,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lans.foodricion.R
 import com.lans.foodricion.domain.model.InputWrapper
-import com.lans.foodricion.presentation.component.message_bubble.MessageBubble
 import com.lans.foodricion.presentation.component.textfield.ValidableTextField
 import com.lans.foodricion.presentation.theme.Background
 import com.lans.foodricion.presentation.theme.Primary
@@ -35,7 +33,8 @@ import com.lans.foodricion.presentation.theme.White
 
 @Composable
 fun ChatBotScreen(
-    innerPadding: PaddingValues
+    innerPadding: PaddingValues,
+    navigateBack: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -54,7 +53,9 @@ fun ChatBotScreen(
             Icon(
                 modifier = Modifier
                     .size(48.dp)
-                    .clickable { },
+                    .clickable {
+                        navigateBack.invoke()
+                    },
                 painter = painterResource(id = R.drawable.ic_back),
                 tint = White,
                 contentDescription = stringResource(id = R.string.content_description)
