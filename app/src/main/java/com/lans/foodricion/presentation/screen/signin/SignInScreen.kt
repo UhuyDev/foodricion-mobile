@@ -44,15 +44,13 @@ fun SignInScreen(
     navigateToHome: () -> Unit
 ) {
     val state by viewModel.state
-    var showAlert by remember {
-        mutableStateOf(Pair(false, ""))
-    }
+    var showAlert by remember { mutableStateOf(Pair(false, "")) }
 
     if (showAlert.first) {
         Alert(
             title = "Error",
             description = showAlert.second,
-            onDismissRequest = {
+            onDismissClick = {
                 showAlert = showAlert.copy(first = false)
             },
             onConfirmClick = {
@@ -160,7 +158,7 @@ fun SignInScreen(
                     modifier = Modifier
                         .padding(
                             start = 28.dp,
-                            top = 12.dp,
+                            top = 4.dp,
                             end = 28.dp,
                             bottom = 4.dp
                         ),
