@@ -20,7 +20,8 @@ import com.lans.foodricion.presentation.screen.profile.ProfileScreen
 fun MainNavGraph(
     rootNavController: NavController,
     mainNavController: NavHostController,
-    innerPadding: PaddingValues
+    innerPadding: PaddingValues,
+    isAuthenticated: Boolean
 ) {
     NavHost(
         navController = mainNavController,
@@ -57,7 +58,12 @@ fun MainNavGraph(
             }
         ) {
             ChatBotScreen(
-                innerPadding = innerPadding,
+                isAuthenticated = isAuthenticated,
+                navigateSignIn = {
+                    rootNavController.navigate(route = AuthRoute.SignInScreen.route) {
+                        popUpTo(route = MainRoute.ProfileScreen.route)
+                    }
+                },
                 navigateBack = {
                     mainNavController.navigateUp()
                 }

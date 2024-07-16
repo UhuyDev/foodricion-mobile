@@ -4,6 +4,7 @@ import android.app.Activity
 import androidx.activity.compose.BackHandler
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,6 +28,7 @@ fun MainScreen(
     val navBackStackEntry by mainNavController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination
     var lastSelectedRoute by remember { mutableStateOf<MainRoute>(MainRoute.HomeScreen) }
+
     BackHandler {
         if (currentRoute?.route == MainRoute.HomeScreen.route) {
             activity.finish()
@@ -66,7 +68,8 @@ fun MainScreen(
         MainNavGraph(
             rootNavController = rootNavController,
             mainNavController = mainNavController,
-            innerPadding = paddingValues
+            innerPadding = paddingValues,
+            isAuthenticated = isAuthenticated
         )
     }
 }

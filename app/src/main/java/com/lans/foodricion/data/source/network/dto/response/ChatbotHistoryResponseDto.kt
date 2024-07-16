@@ -1,10 +1,11 @@
 package com.lans.foodricion.data.source.network.dto.response
 
-import android.os.Build
-import androidx.annotation.RequiresApi
+import android.annotation.SuppressLint
 import com.lans.foodricion.domain.model.ChatbotMessage
 import com.squareup.moshi.Json
-import java.time.LocalDateTime
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 data class ChatbotHistoryResponseDto(
     @field:Json(name = "user_id")
@@ -14,10 +15,15 @@ data class ChatbotHistoryResponseDto(
     val timestamp: String
 )
 
-@RequiresApi(Build.VERSION_CODES.O)
 fun ChatbotHistoryResponseDto.toDomain() = ChatbotMessage(
     userId = userId,
     message = message,
     response = response,
-    timestamp = LocalDateTime.now()
+    timestamp = convertTimestamp(timestamp)
 )
+
+@SuppressLint("SimpleDateFormat")
+fun convertTimestamp(timestamp: String): String {
+    val parser = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS", Locale.getDefault())
+    return SimpleDateFormat("dd.MM.yyyy HH:mm").format(parser.parse(timestamp)!!)
+}

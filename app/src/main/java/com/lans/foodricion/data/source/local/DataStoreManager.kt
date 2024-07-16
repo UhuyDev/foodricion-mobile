@@ -1,6 +1,7 @@
 package com.lans.foodricion.data.source.local
 
 import android.content.Context
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -30,6 +31,7 @@ class DataStoreManager @Inject constructor(private val context: Context) {
 
     fun getAccessToken(): Flow<String> {
         return context.dataStore.data.map { preferences ->
+            Log.d("TOKEN", "intercept: " + preferences[ACCESS_TOKEN])
             preferences[ACCESS_TOKEN] ?: ""
         }
     }

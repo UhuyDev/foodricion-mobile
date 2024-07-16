@@ -5,14 +5,15 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -29,11 +30,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.lans.foodricion.R
 import com.lans.foodricion.presentation.component.alert.Alert
@@ -46,12 +50,14 @@ import com.lans.foodricion.presentation.theme.White
 @Composable
 fun ChatBotScreen(
     viewModel: ChatbotViewModel = hiltViewModel(),
-    innerPadding: PaddingValues,
+    isAuthenticated: Boolean,
+    navigateSignIn: () -> Unit,
     navigateBack: () -> Unit
 ) {
     val state by viewModel.state
     val chatState = rememberLazyListState()
     var showAlert by remember { mutableStateOf(Pair(false, "")) }
+    var showUnauthenticated by remember { mutableStateOf(false) }
 
     if (showAlert.first) {
         Alert(
@@ -70,31 +76,60 @@ fun ChatBotScreen(
         )
     }
 
-    LaunchedEffect(key1 = state.isMessageSent, key2 = state.messages, key3 = state.error) {
-        val messageResponse = state.isMessageSent
-        val error = state.error
+    if (showUnauthenticated) {
+        Alert(
+            title = "Your session is expired",
+            description = "Please sign in again",
+            onDismissClick = {
+                showAlert = showAlert.copy(first = false)
+            },
+            onConfirmClick = {
+                Button(onClick = {
+                    showAlert = showAlert.copy(first = false)
+                    navigateSignIn.invoke()
+                }) {
+                    Text(text = "Sign In")
+                }
+            }
+        )
+    }
 
-        if (messageResponse) {
+    LaunchedEffect(key1 = isAuthenticated) {
+        showUnauthenticated = !isAuthenticated
+    }
+
+    LaunchedEffect(key1 = state.messages.size, key2 = state.isMessageSent, key3 = state.error) {
+        if(!showUnauthenticated) {
+            val error = state.error
+
             chatState.animateScrollToItem(chatState.layoutInfo.totalItemsCount)
-        }
 
-        if (error.isNotBlank()) {
-            showAlert = Pair(true, error)
-            state.error = ""
+            if (error.isNotBlank()) {
+                showAlert = Pair(true, state.error)
+                state.error = ""
+            }
         }
     }
 
-    Column(
+    ConstraintLayout(
         modifier = Modifier
             .background(Background)
             .fillMaxSize()
-            .padding(innerPadding),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .statusBarsPadding()
     ) {
+        val (topBar, messages, chatBox) = createRefs()
+
         Row(
             modifier = Modifier
                 .background(Primary)
                 .fillMaxWidth()
+                .constrainAs(topBar) {
+                    top.linkTo(parent.top)
+                    bottom.linkTo(messages.top)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    height = Dimension.wrapContent
+                }
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -125,10 +160,17 @@ fun ChatBotScreen(
         }
         LazyColumn(
             modifier = Modifier
+                .fillMaxWidth()
+                .constrainAs(messages) {
+                    top.linkTo(topBar.bottom)
+                    bottom.linkTo(chatBox.top)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    height = Dimension.fillToConstraints
+                }
                 .padding(
                     horizontal = 16.dp
-                )
-                .weight(1f),
+                ),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             state = chatState
         ) {
@@ -145,46 +187,40 @@ fun ChatBotScreen(
                 )
             }
         }
-        Box {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        start = 16.dp,
-                        top = 16.dp,
-                        bottom = 16.dp,
-                        end = 8.dp
-                    ),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                ValidableTextField(
-                    modifier = Modifier
-                        .padding(
-                            end = 4.dp
-                        )
-                        .weight(1f),
-                    input = state.message,
-                    isSupportiveText = false,
-                    onValueChange = {
-                        viewModel.onEvent(ChatbotUIEvent.MessageChanged(it))
-                    }
-                )
-                IconButton(
-                    modifier = Modifier
-                        .size(48.dp),
-                    onClick = {
-                        viewModel.onEvent(ChatbotUIEvent.SendButtonClicked)
-                    }
-                ) {
-                    Icon(
-                        modifier = Modifier
-                            .size(40.dp),
-                        painter = painterResource(id = R.drawable.ic_send),
-                        tint = Primary,
-                        contentDescription = stringResource(id = R.string.content_description)
-                    )
+        Box(
+            modifier = Modifier
+                .background(Color.Transparent)
+                .fillMaxWidth()
+                .navigationBarsPadding()
+                .imePadding()
+                .constrainAs(chatBox) {
+                    bottom.linkTo(parent.bottom)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    height = Dimension.wrapContent
                 }
-            }
+                .padding(16.dp)
+        ) {
+            ValidableTextField(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                input = state.message,
+                isSupportiveText = false,
+                trailingIcon = {
+                    IconButton(onClick = {
+                        viewModel.onEvent(ChatbotUIEvent.SendButtonClicked)
+                    }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_send),
+                            tint = Primary,
+                            contentDescription = stringResource(id = R.string.content_description)
+                        )
+                    }
+                },
+                onValueChange = {
+                    viewModel.onEvent(ChatbotUIEvent.MessageChanged(it))
+                }
+            )
         }
     }
 }

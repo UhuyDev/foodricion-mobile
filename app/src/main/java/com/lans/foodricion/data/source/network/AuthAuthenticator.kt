@@ -3,6 +3,7 @@ package com.lans.foodricion.data.source.network
 import com.lans.foodricion.common.Constant.BASE_URL
 import com.lans.foodricion.common.Constant.HEADER_AUTHORIZATION
 import com.lans.foodricion.common.Constant.TOKEN_TYPE
+import com.lans.foodricion.data.Resource
 import com.lans.foodricion.data.source.local.DataStoreManager
 import com.lans.foodricion.data.source.network.api.FoodricionApi
 import com.lans.foodricion.data.source.network.dto.ApiResponse
@@ -27,28 +28,43 @@ class AuthAuthenticator @Inject constructor(
 
         synchronized(this) {
             val newToken = runBlocking {
-                refreshToken(currentRefreshToken)
+                safeCall {
+                    refreshToken(currentRefreshToken)
+                }
             }
 
-            if (newToken.code != 200) {
-                return null
+            var refreshTokenResponse: RefreshTokenResponseDto? = null
+
+            when (newToken) {
+                is Resource.Success -> {
+                    refreshTokenResponse = newToken.data.data
+                }
+
+                is Resource.Error -> {
+                    runBlocking {
+                        dataStoreManager.clear()
+                    }
+                    return null
+                }
+
+                else -> Unit
             }
 
-            newToken.let { body ->
+            refreshTokenResponse.let { body ->
                 runBlocking {
                     dataStoreManager.storeData(
                         DataStoreManager.ACCESS_TOKEN,
-                        body.data!!.accessToken
+                        body!!.accessToken
                     )
                     dataStoreManager.storeData(
                         DataStoreManager.REFRESH_TOKEN,
-                        body.data.refreshToken
+                        body.refreshToken
                     )
-                    dataStoreManager.storeData(DataStoreManager.EXPIRED_AT, body.data.expiredAt)
+                    dataStoreManager.storeData(DataStoreManager.EXPIRED_AT, body.expiredAt)
                 }
 
                 return response.request.newBuilder()
-                    .header(HEADER_AUTHORIZATION, "$TOKEN_TYPE ${body.data!!.accessToken}")
+                    .header(HEADER_AUTHORIZATION, "$TOKEN_TYPE ${body!!.accessToken}")
                     .build()
             }
         }

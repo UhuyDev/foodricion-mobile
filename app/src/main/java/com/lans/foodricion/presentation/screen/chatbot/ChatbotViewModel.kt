@@ -10,6 +10,8 @@ import com.lans.foodricion.domain.usecase.GetChatbotHistoryUseCase
 import com.lans.foodricion.domain.usecase.SendChatbotMessageUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -44,7 +46,7 @@ class ChatbotViewModel @Inject constructor(
     fun sendMessage() {
         val stateValue = state.value
 
-        if (stateValue.message.value == "" && stateValue.message.value == " ") {
+        if (stateValue.message.value.isBlank()) {
             return
         }
 
@@ -55,8 +57,8 @@ class ChatbotViewModel @Inject constructor(
                 when (response) {
                     is Resource.Success -> {
                         _state.value = _state.value.copy(
-                            isMessageSent = true,
                             message = InputWrapper(),
+                            isMessageSent = true,
                             isLoading = false
                         )
                     }
@@ -64,12 +66,14 @@ class ChatbotViewModel @Inject constructor(
                     is Resource.Error -> {
                         _state.value = _state.value.copy(
                             error = response.message,
+                            isMessageSent = false,
                             isLoading = false
                         )
                     }
 
                     is Resource.Loading -> {
                         _state.value = _state.value.copy(
+                            isMessageSent = false,
                             isLoading = true
                         )
                     }
@@ -85,8 +89,10 @@ class ChatbotViewModel @Inject constructor(
             getChatbotHistoryUseCase.invoke().collect { response ->
                 when (response) {
                     is Resource.Success -> {
+                        val dateFormat = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault())
+                        val sortedMessages = response.data.sortedBy { dateFormat.parse(it.timestamp) }
                         _state.value = _state.value.copy(
-                            messages = response.data,
+                            messages = sortedMessages,
                             isLoading = false
                         )
                     }

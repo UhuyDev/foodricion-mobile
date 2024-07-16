@@ -64,6 +64,7 @@ compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
 compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
+constraintlayout = { module = "androidx.constraintlayout:constraintlayout-compose", version = "1.0.1" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 
 navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation" }
@@ -93,6 +94,7 @@ tflite-task-vision = { module = "org.tensorflow:tensorflow-lite-task-vision", ve
 tflite-gpu = { module = "org.tensorflow:tensorflow-lite-gpu", version.ref = "tflite-gpu" }
 tflite-gpu-delegate = { module = "org.tensorflow:tensorflow-lite-gpu-delegate-plugin", version.ref = "tflite-gpu-delegate" }
 accompanist-permission = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
+accompanist-insets = { module = "com.google.accompanist:accompanist-insets", version.ref = "accompanist" }
 
 junit = { module = "junit:junit", version.ref = "junit" }
 test-ext = { module = "androidx.test.ext:junit", version.ref = "test-ext" }
