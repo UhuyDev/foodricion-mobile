@@ -4,7 +4,6 @@ import android.app.Activity
 import androidx.activity.compose.BackHandler
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -14,7 +13,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.lans.foodricion.presentation.component.bottom_navigation.BottomNavigationBar
-import com.lans.foodricion.presentation.navigation.AuthRoute
 import com.lans.foodricion.presentation.navigation.MainRoute
 import com.lans.foodricion.presentation.navigation.graph.MainNavGraph
 
@@ -36,7 +34,7 @@ fun MainScreen(
     }
     Scaffold(
         bottomBar = {
-            if (currentRoute?.route != MainRoute.ChatBotScreen.route) {
+            if (currentRoute?.route != MainRoute.ChatBotScreen.route && currentRoute?.route != MainRoute.FoodScreen.route) {
                 BottomNavigationBar(
                     selectedItem = lastSelectedRoute,
                     navigateToHome = {

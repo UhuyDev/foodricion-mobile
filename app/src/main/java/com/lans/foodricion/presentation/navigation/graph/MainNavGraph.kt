@@ -13,6 +13,7 @@ import com.lans.foodricion.presentation.navigation.AuthRoute
 import com.lans.foodricion.presentation.navigation.MainRoute
 import com.lans.foodricion.presentation.screen.change_password.ChangePasswordScreen
 import com.lans.foodricion.presentation.screen.chatbot.ChatBotScreen
+import com.lans.foodricion.presentation.screen.food.FoodScreen
 import com.lans.foodricion.presentation.screen.home.HomeScreen
 import com.lans.foodricion.presentation.screen.profile.ProfileScreen
 
@@ -30,6 +31,11 @@ fun MainNavGraph(
         composable(route = MainRoute.HomeScreen.route) {
             HomeScreen(
                 innerPadding = innerPadding,
+                navigateToFood = {
+                    mainNavController.navigate(route = MainRoute.FoodScreen.route) {
+                        popUpTo(route = MainRoute.HomeScreen.route)
+                    }
+                },
                 isAuthenticated = isAuthenticated
             )
         }
@@ -104,6 +110,13 @@ fun MainNavGraph(
         composable(route = MainRoute.ChangePasswordScreen.route) {
             ChangePasswordScreen(
                 navigateToProfile = {
+                    mainNavController.navigateUp()
+                }
+            )
+        }
+        composable(route = MainRoute.FoodScreen.route) {
+            FoodScreen(
+                navigateToHome = {
                     mainNavController.navigateUp()
                 }
             )

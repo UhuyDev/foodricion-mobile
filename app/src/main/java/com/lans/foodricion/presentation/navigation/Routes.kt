@@ -17,4 +17,5 @@ sealed class MainRoute(val route: String) {
     object ChatBotScreen: MainRoute("chatBot")
     object ProfileScreen: MainRoute("profile")
     object ChangePasswordScreen: MainRoute("changePassword")
+    object FoodScreen: MainRoute("food")
 }

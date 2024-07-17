@@ -4,6 +4,7 @@ import android.content.Context
 import com.lans.foodricion.common.Constant.BASE_URL
 import com.lans.foodricion.data.repository.AuthRepository
 import com.lans.foodricion.data.repository.ChatbotRepository
+import com.lans.foodricion.data.repository.FoodRepository
 import com.lans.foodricion.data.repository.UserRepository
 import com.lans.foodricion.data.source.local.DataStoreManager
 import com.lans.foodricion.data.source.network.AuthAuthenticator
@@ -12,6 +13,8 @@ import com.lans.foodricion.data.source.network.api.FoodricionApi
 import com.lans.foodricion.data.tensorflow.TfLiteClassifier
 import com.lans.foodricion.domain.interactor.ForgotPasswordInteractor
 import com.lans.foodricion.domain.interactor.GetChatbotHistoryInteractor
+import com.lans.foodricion.domain.interactor.GetFoodByNameInteractor
+import com.lans.foodricion.domain.interactor.GetFoodsInteractor
 import com.lans.foodricion.domain.interactor.GetImageTempUriInteractor
 import com.lans.foodricion.domain.interactor.GetMeInteractor
 import com.lans.foodricion.domain.interactor.IsAuthenticatedInteractor
@@ -29,10 +32,13 @@ import com.lans.foodricion.domain.interactor.validator.ValidatePasswordInteracto
 import com.lans.foodricion.domain.interactor.validator.ValidatorInteractor
 import com.lans.foodricion.domain.repository.IAuthRepository
 import com.lans.foodricion.domain.repository.IChatbotRepository
+import com.lans.foodricion.domain.repository.IFoodRepository
 import com.lans.foodricion.domain.repository.IUserRepository
 import com.lans.foodricion.domain.tensorflow.FoodClassifier
 import com.lans.foodricion.domain.usecase.ForgotPasswordUseCase
 import com.lans.foodricion.domain.usecase.GetChatbotHistoryUseCase
+import com.lans.foodricion.domain.usecase.GetFoodByNameUseCase
+import com.lans.foodricion.domain.usecase.GetFoodsUseCase
 import com.lans.foodricion.domain.usecase.GetImageTempUriUseCase
 import com.lans.foodricion.domain.usecase.GetMeUseCase
 import com.lans.foodricion.domain.usecase.IsAuthenticatedUseCase
@@ -134,6 +140,14 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideFoodRepository(
+        api: FoodricionApi
+    ): IFoodRepository {
+        return FoodRepository(api)
+    }
+
+    @Provides
+    @Singleton
     fun provideSignInUseCase(authRepository: IAuthRepository): SignInUseCase {
         return SignInInteractor(authRepository)
     }
@@ -196,6 +210,18 @@ object AppModule {
     @Singleton
     fun provideGetChatbotHistoryUseCase(chatbotRepository: ChatbotRepository): GetChatbotHistoryUseCase {
         return GetChatbotHistoryInteractor(chatbotRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetFoodByNameUseCase(foodRepository: IFoodRepository): GetFoodByNameUseCase {
+        return GetFoodByNameInteractor(foodRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetFoodsUseCase(foodRepository: IFoodRepository): GetFoodsUseCase {
+        return GetFoodsInteractor(foodRepository)
     }
 
     @Provides

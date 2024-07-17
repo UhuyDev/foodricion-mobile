@@ -46,7 +46,7 @@ import com.lans.foodricion.presentation.component.bottom_sheet.ScanBottomSheet
 import com.lans.foodricion.presentation.component.bottom_sheet.ScanResultBottomSheet
 import com.lans.foodricion.presentation.component.button.CardButton
 import com.lans.foodricion.presentation.component.daily_nutrition.DailyNutrition
-import com.lans.foodricion.presentation.component.nutrition_history.NutritionHistoryItem
+import com.lans.foodricion.presentation.component.food_item.FoodItem
 import com.lans.foodricion.presentation.theme.Background
 import com.lans.foodricion.presentation.theme.Black
 import com.lans.foodricion.presentation.theme.Primary
@@ -57,6 +57,7 @@ import com.lans.foodricion.utils.getActivity
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     innerPadding: PaddingValues,
+    navigateToFood: () -> Unit,
     isAuthenticated: Boolean
 ) {
     val context = LocalContext.current
@@ -170,7 +171,6 @@ fun HomeScreen(
             .background(Background)
             .statusBarsPadding()
             .padding(
-                top = 8.dp,
                 bottom = innerPadding.calculateBottomPadding()
             )
     ) {
@@ -211,6 +211,7 @@ fun HomeScreen(
                 iconColor = Primary,
                 text = stringResource(R.string.foods),
                 onClick = {
+                    navigateToFood.invoke()
                 }
             )
             CardButton(
@@ -257,29 +258,44 @@ fun HomeScreen(
                     ),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                NutritionHistoryItem(
+                FoodItem(
+                    modifier = Modifier,
+                    foodName = "Example",
                     imgUrl = "",
                     calorie = 220,
+                    isHistory = true,
                     onClick = { }
                 )
-                NutritionHistoryItem(
+                FoodItem(
+                    modifier = Modifier,
+                    foodName = "Example",
                     imgUrl = "",
                     calorie = 220,
+                    isHistory = true,
                     onClick = { }
                 )
-                NutritionHistoryItem(
+                FoodItem(
+                    modifier = Modifier,
+                    foodName = "Example",
                     imgUrl = "",
                     calorie = 220,
+                    isHistory = true,
                     onClick = { }
                 )
-                NutritionHistoryItem(
+                FoodItem(
+                    modifier = Modifier,
+                    foodName = "Example",
                     imgUrl = "",
                     calorie = 220,
+                    isHistory = true,
                     onClick = { }
                 )
-                NutritionHistoryItem(
+                FoodItem(
+                    modifier = Modifier,
+                    foodName = "Example",
                     imgUrl = "",
                     calorie = 220,
+                    isHistory = true,
                     onClick = { }
                 )
             }
