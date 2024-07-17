@@ -43,7 +43,7 @@ class ChatbotViewModel @Inject constructor(
         }
     }
 
-    fun sendMessage() {
+    private fun sendMessage() {
         val stateValue = state.value
 
         if (stateValue.message.value.isBlank()) {
@@ -57,7 +57,6 @@ class ChatbotViewModel @Inject constructor(
                 when (response) {
                     is Resource.Success -> {
                         _state.value = _state.value.copy(
-                            message = InputWrapper(),
                             isMessageSent = true,
                             isLoading = false
                         )

@@ -56,7 +56,8 @@ import com.lans.foodricion.utils.getActivity
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
-    innerPadding: PaddingValues
+    innerPadding: PaddingValues,
+    isAuthenticated: Boolean
 ) {
     val context = LocalContext.current
     val state by viewModel.state
@@ -225,8 +226,7 @@ fun HomeScreen(
                 .fillMaxWidth()
                 .padding(
                     start = 24.dp,
-                    end = 24.dp,
-                    bottom = 16.dp
+                    end = 24.dp
                 )
                 .weight(1f),
             colors = CardDefaults.cardColors(

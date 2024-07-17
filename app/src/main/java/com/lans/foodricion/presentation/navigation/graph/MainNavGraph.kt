@@ -28,7 +28,10 @@ fun MainNavGraph(
         startDestination = MainRoute.HomeScreen.route
     ) {
         composable(route = MainRoute.HomeScreen.route) {
-            HomeScreen(innerPadding = innerPadding)
+            HomeScreen(
+                innerPadding = innerPadding,
+                isAuthenticated = isAuthenticated
+            )
         }
         composable(
             route = MainRoute.ChatBotScreen.route,
@@ -72,6 +75,7 @@ fun MainNavGraph(
         composable(route = MainRoute.ProfileScreen.route) {
             KeyboardAware {
                 ProfileScreen(
+                    isAuthenticated = isAuthenticated,
                     navigateToSignIn = {
                         rootNavController.navigate(route = AuthRoute.SignInScreen.route) {
                             popUpTo(route = MainRoute.ProfileScreen.route)

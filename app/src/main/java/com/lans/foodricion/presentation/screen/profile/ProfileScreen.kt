@@ -40,12 +40,12 @@ import com.lans.foodricion.presentation.theme.White
 @Composable
 fun ProfileScreen(
     viewModel: ProfileViewModel = hiltViewModel(),
+    isAuthenticated: Boolean,
     navigateToSignIn: () -> Unit,
     navigateToSignUp: () -> Unit,
     navigateToChangePassword: () -> Unit,
     navigateToSignOut: () -> Unit
 ) {
-    val isLoggedIn = false
     Column(
         modifier = Modifier
             .background(Background)
@@ -66,7 +66,7 @@ fun ProfileScreen(
             fontWeight = FontWeight.Bold
         )
 
-        if (isLoggedIn) {
+        if (isAuthenticated) {
             Row(
                 modifier = Modifier
                     .padding(
@@ -136,7 +136,7 @@ fun ProfileScreen(
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            if (!isLoggedIn) {
+            if (!isAuthenticated) {
                 ProfileButton(
                     modifier = Modifier,
                     text = stringResource(id = R.string.sign_in),
@@ -191,7 +191,7 @@ fun ProfileScreen(
                 onClick = {}
             )
 
-            if (isLoggedIn) {
+            if (isAuthenticated) {
                 ProfileButton(
                     modifier = Modifier,
                     text = stringResource(R.string.sign_out),

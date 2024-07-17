@@ -40,6 +40,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.lans.foodricion.R
+import com.lans.foodricion.domain.model.InputWrapper
 import com.lans.foodricion.presentation.component.alert.Alert
 import com.lans.foodricion.presentation.component.message_bubble.MessageBubble
 import com.lans.foodricion.presentation.component.textfield.ValidableTextField
@@ -102,6 +103,9 @@ fun ChatBotScreen(
         if(!showUnauthenticated) {
             val error = state.error
 
+            if(state.isMessageSent) {
+                viewModel.getMessages()
+            }
             chatState.animateScrollToItem(chatState.layoutInfo.totalItemsCount)
 
             if (error.isNotBlank()) {
@@ -209,6 +213,7 @@ fun ChatBotScreen(
                 trailingIcon = {
                     IconButton(onClick = {
                         viewModel.onEvent(ChatbotUIEvent.SendButtonClicked)
+                        state.message = InputWrapper()
                     }) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_send),
