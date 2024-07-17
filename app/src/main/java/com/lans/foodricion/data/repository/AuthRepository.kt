@@ -42,7 +42,7 @@ class AuthRepository @Inject constructor(
         dataStoreManager.storeData(DataStoreManager.EXPIRED_AT, expiredAt)
     }
 
-    override suspend fun signin(email: String, password: String): Flow<Resource<Token>> {
+    override suspend fun signIn(email: String, password: String): Flow<Resource<Token>> {
         return flow {
             emit(Resource.Loading)
             emit(safeCall {
@@ -61,7 +61,7 @@ class AuthRepository @Inject constructor(
         }
     }
 
-    override suspend fun signup(
+    override suspend fun signUp(
         email: String,
         fullname: String,
         password: String
@@ -78,5 +78,9 @@ class AuthRepository @Inject constructor(
                 ).code == 201
             })
         }
+    }
+
+    override suspend fun signOut() {
+        dataStoreManager.clear()
     }
 }

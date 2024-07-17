@@ -62,7 +62,7 @@ fun MainNavGraph(
         ) {
             ChatBotScreen(
                 isAuthenticated = isAuthenticated,
-                navigateSignIn = {
+                navigateToSignIn = {
                     rootNavController.navigate(route = AuthRoute.SignInScreen.route) {
                         popUpTo(route = MainRoute.ProfileScreen.route)
                     }
@@ -91,7 +91,7 @@ fun MainNavGraph(
                             popUpTo(route = MainRoute.ChangePasswordScreen.route)
                         }
                     },
-                    navigateToSignOut = {
+                    signOut = {
                         rootNavController.navigate(route = AuthRoute.SignInScreen.route) {
                             popUpTo(route = MainRoute.ProfileScreen.route) {
                                 inclusive = true

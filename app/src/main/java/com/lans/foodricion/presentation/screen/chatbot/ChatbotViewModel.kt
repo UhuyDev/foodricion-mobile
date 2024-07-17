@@ -88,7 +88,7 @@ class ChatbotViewModel @Inject constructor(
             getChatbotHistoryUseCase.invoke().collect { response ->
                 when (response) {
                     is Resource.Success -> {
-                        val dateFormat = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault())
+                        val dateFormat = SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.getDefault())
                         val sortedMessages = response.data.sortedBy { dateFormat.parse(it.timestamp) }
                         _state.value = _state.value.copy(
                             messages = sortedMessages,

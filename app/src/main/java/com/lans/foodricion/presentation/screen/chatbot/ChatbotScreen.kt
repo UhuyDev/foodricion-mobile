@@ -52,7 +52,7 @@ import com.lans.foodricion.presentation.theme.White
 fun ChatBotScreen(
     viewModel: ChatbotViewModel = hiltViewModel(),
     isAuthenticated: Boolean,
-    navigateSignIn: () -> Unit,
+    navigateToSignIn: () -> Unit,
     navigateBack: () -> Unit
 ) {
     val state by viewModel.state
@@ -82,12 +82,12 @@ fun ChatBotScreen(
             title = "Your session is expired",
             description = "Please sign in again",
             onDismissClick = {
-                showAlert = showAlert.copy(first = false)
+                showUnauthenticated = false
             },
             onConfirmClick = {
                 Button(onClick = {
-                    showAlert = showAlert.copy(first = false)
-                    navigateSignIn.invoke()
+                    showUnauthenticated = false
+                    navigateToSignIn.invoke()
                 }) {
                     Text(text = "Sign In")
                 }

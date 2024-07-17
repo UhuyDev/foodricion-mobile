@@ -5,6 +5,7 @@ import com.lans.foodricion.data.source.network.SafeApiCall
 import com.lans.foodricion.data.source.network.api.FoodricionApi
 import com.lans.foodricion.data.source.network.dto.request.ForgotPasswordRequestDto
 import com.lans.foodricion.data.source.network.dto.request.VerifyOTPRequestDto
+import com.lans.foodricion.data.source.network.dto.response.toDomain
 import com.lans.foodricion.domain.model.User
 import com.lans.foodricion.domain.repository.IUserRepository
 import kotlinx.coroutines.flow.Flow
@@ -15,7 +16,13 @@ class UserRepository @Inject constructor(
     private val api: FoodricionApi
 ) : IUserRepository, SafeApiCall {
     override suspend fun me(): Flow<Resource<User>> {
-        TODO("Not yet implemented")
+        return flow {
+            emit(Resource.Loading)
+            emit(safeCall {
+                val response = api.me()
+                response.toDomain()
+            })
+        }
     }
 
     override suspend fun forgotPassword(email: String): Flow<Resource<Boolean>> {

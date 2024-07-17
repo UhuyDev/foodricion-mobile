@@ -8,6 +8,7 @@ import com.lans.foodricion.data.source.network.dto.request.SignInRequestDto
 import com.lans.foodricion.data.source.network.dto.request.SignUpRequestDto
 import com.lans.foodricion.data.source.network.dto.request.VerifyOTPRequestDto
 import com.lans.foodricion.data.source.network.dto.response.ChatbotHistoryResponseDto
+import com.lans.foodricion.data.source.network.dto.response.MeResponseDto
 import com.lans.foodricion.data.source.network.dto.response.RefreshTokenResponseDto
 import com.lans.foodricion.data.source.network.dto.response.SignInResponseDto
 import com.lans.foodricion.data.source.network.dto.response.SignUpResponseDto
@@ -26,6 +27,9 @@ interface FoodricionApi {
     suspend fun signup(
         @Body requestBody: SignUpRequestDto,
     ): ApiResponse<SignUpResponseDto>
+
+    @GET("/me")
+    suspend fun me(): MeResponseDto
 
     @POST("refresh-token")
     suspend fun refreshToken(

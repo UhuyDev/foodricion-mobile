@@ -13,9 +13,11 @@ import com.lans.foodricion.data.tensorflow.TfLiteClassifier
 import com.lans.foodricion.domain.interactor.ForgotPasswordInteractor
 import com.lans.foodricion.domain.interactor.GetChatbotHistoryInteractor
 import com.lans.foodricion.domain.interactor.GetImageTempUriInteractor
+import com.lans.foodricion.domain.interactor.GetMeInteractor
 import com.lans.foodricion.domain.interactor.IsAuthenticatedInteractor
 import com.lans.foodricion.domain.interactor.SendChatBotMessageInteractor
 import com.lans.foodricion.domain.interactor.SignInInteractor
+import com.lans.foodricion.domain.interactor.SignOutInteractor
 import com.lans.foodricion.domain.interactor.SignUpInteractor
 import com.lans.foodricion.domain.interactor.StoreSessionInteractor
 import com.lans.foodricion.domain.interactor.VerifyOTPInteractor
@@ -32,9 +34,11 @@ import com.lans.foodricion.domain.tensorflow.FoodClassifier
 import com.lans.foodricion.domain.usecase.ForgotPasswordUseCase
 import com.lans.foodricion.domain.usecase.GetChatbotHistoryUseCase
 import com.lans.foodricion.domain.usecase.GetImageTempUriUseCase
+import com.lans.foodricion.domain.usecase.GetMeUseCase
 import com.lans.foodricion.domain.usecase.IsAuthenticatedUseCase
 import com.lans.foodricion.domain.usecase.SendChatbotMessageUseCase
 import com.lans.foodricion.domain.usecase.SignInUseCase
+import com.lans.foodricion.domain.usecase.SignOutUseCase
 import com.lans.foodricion.domain.usecase.SignUpUseCase
 import com.lans.foodricion.domain.usecase.StoreSessionUseCase
 import com.lans.foodricion.domain.usecase.VerifyOTPUseCase
@@ -138,6 +142,18 @@ object AppModule {
     @Singleton
     fun provideSignUpUseCase(authRepository: IAuthRepository): SignUpUseCase {
         return SignUpInteractor(authRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSignOutUseCase(authRepository: IAuthRepository): SignOutUseCase {
+        return SignOutInteractor(authRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetMeUseCase(userRepository: IUserRepository): GetMeUseCase {
+        return GetMeInteractor(userRepository)
     }
 
     @Provides

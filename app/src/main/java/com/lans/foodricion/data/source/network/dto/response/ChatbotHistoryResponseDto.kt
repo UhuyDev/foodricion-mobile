@@ -25,5 +25,5 @@ fun ChatbotHistoryResponseDto.toDomain() = ChatbotMessage(
 @SuppressLint("SimpleDateFormat")
 fun convertTimestamp(timestamp: String): String {
     val parser = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS", Locale.getDefault())
-    return SimpleDateFormat("dd.MM.yyyy HH:mm").format(parser.parse(timestamp)!!)
+    return SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(parser.parse(timestamp)!!)
 }
