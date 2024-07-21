@@ -57,4 +57,10 @@
     <string name="nutritions">Nutritions</string>
     <string name="no_food_data_available">No food data available.</string>
     <string name="add_to_daily_nutrition">Add to daily nutrition</string>
+    <string name="height_cm">Height (cm)</string>
+    <string name="weight_kg">Weight (kg)</string>
+    <string name="calculate">Calculate</string>
+    <string name="score">Score</string>
+    <string name="category">Category</string>
+    <string name="bmi_calculator">BMI Calculator</string>
 </resources>

@@ -58,6 +58,7 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     innerPadding: PaddingValues,
     navigateToFood: () -> Unit,
+    navigateToBMI: () -> Unit,
     isAuthenticated: Boolean
 ) {
     val context = LocalContext.current
@@ -227,7 +228,9 @@ fun HomeScreen(
                 icon = painterResource(id = R.drawable.ic_calculator),
                 iconColor = Primary,
                 text = stringResource(R.string.bmi),
-                onClick = { }
+                onClick = {
+                    navigateToBMI.invoke()
+                }
             )
         }
         Card(

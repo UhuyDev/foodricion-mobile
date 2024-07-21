@@ -39,6 +39,7 @@ fun MainScreen(
                 MainRoute.FoodScreen.route,
                 MainRoute.FoodDetailScreen.route + "/{foodName}",
                 MainRoute.EditProfileScreen.route + "/{fullname}/{email}",
+                MainRoute.BMIScreen.route
             )
 
             if (isBottomBarVisible) {

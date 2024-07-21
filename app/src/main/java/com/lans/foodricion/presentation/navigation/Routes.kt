@@ -20,4 +20,5 @@ sealed class MainRoute(val route: String) {
     object ChangePasswordScreen: MainRoute("changePassword")
     object FoodScreen: MainRoute("food")
     object FoodDetailScreen: MainRoute("foodDetail")
+    object BMIScreen: MainRoute("bmi")
 }

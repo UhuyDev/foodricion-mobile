@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import com.lans.foodricion.presentation.component.keyboard_aware.KeyboardAware
 import com.lans.foodricion.presentation.navigation.AuthRoute
 import com.lans.foodricion.presentation.navigation.MainRoute
+import com.lans.foodricion.presentation.screen.bmi.BMIScreen
 import com.lans.foodricion.presentation.screen.change_password.ChangePasswordScreen
 import com.lans.foodricion.presentation.screen.chatbot.ChatBotScreen
 import com.lans.foodricion.presentation.screen.edit_profile.EditProfileScreen
@@ -35,6 +36,11 @@ fun MainNavGraph(
                 innerPadding = innerPadding,
                 navigateToFood = {
                     mainNavController.navigate(route = MainRoute.FoodScreen.route) {
+                        popUpTo(route = MainRoute.HomeScreen.route)
+                    }
+                },
+                navigateToBMI = {
+                    mainNavController.navigate(route = MainRoute.BMIScreen.route) {
                         popUpTo(route = MainRoute.HomeScreen.route)
                     }
                 },
@@ -151,6 +157,13 @@ fun MainNavGraph(
                     mainNavController.navigateUp()
                 },
                 foodName = foodName
+            )
+        }
+        composable(route = MainRoute.BMIScreen.route) {
+            BMIScreen(
+                navigateToHome = {
+                    mainNavController.navigateUp()
+                }
             )
         }
     }

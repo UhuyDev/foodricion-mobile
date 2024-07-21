@@ -11,6 +11,7 @@ import com.lans.foodricion.data.source.network.AuthAuthenticator
 import com.lans.foodricion.data.source.network.AuthInterceptor
 import com.lans.foodricion.data.source.network.api.FoodricionApi
 import com.lans.foodricion.data.tensorflow.TfLiteClassifier
+import com.lans.foodricion.domain.interactor.CalculateBMIInteractor
 import com.lans.foodricion.domain.interactor.ChangePasswordInteractor
 import com.lans.foodricion.domain.interactor.ForgotPasswordInteractor
 import com.lans.foodricion.domain.interactor.GetChatbotHistoryInteractor
@@ -38,6 +39,7 @@ import com.lans.foodricion.domain.repository.IChatbotRepository
 import com.lans.foodricion.domain.repository.IFoodRepository
 import com.lans.foodricion.domain.repository.IUserRepository
 import com.lans.foodricion.domain.tensorflow.FoodClassifier
+import com.lans.foodricion.domain.usecase.CalculateBMIUseCase
 import com.lans.foodricion.domain.usecase.ChangePasswordUseCase
 import com.lans.foodricion.domain.usecase.ForgotPasswordUseCase
 import com.lans.foodricion.domain.usecase.GetChatbotHistoryUseCase
@@ -246,6 +248,12 @@ object AppModule {
     @Singleton
     fun provideSearchFoodByNameUseCase(): SearchFoodByNameUseCase {
         return SearchFoodByNameInteractor()
+    }
+
+    @Provides
+    @Singleton
+    fun provideCalculateBMIUseCase(): CalculateBMIUseCase {
+        return CalculateBMIInteractor()
     }
 
     @Provides
