@@ -54,4 +54,7 @@
     <string name="this_action_cannot_be_undone_and_you_will_lose_all_your_data_and_history_permanently">This action cannot be undone and you will lose all your data and history permanently.</string>
     <string name="delete_my_account">Delete My Account</string>
     <string name="old_password">Old Password</string>
+    <string name="nutritions">Nutritions</string>
+    <string name="no_food_data_available">No food data available.</string>
+    <string name="add_to_daily_nutrition">Add to daily nutrition</string>
 </resources>

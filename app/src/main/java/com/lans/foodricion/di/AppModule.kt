@@ -19,6 +19,7 @@ import com.lans.foodricion.domain.interactor.GetFoodsInteractor
 import com.lans.foodricion.domain.interactor.GetImageTempUriInteractor
 import com.lans.foodricion.domain.interactor.GetMeInteractor
 import com.lans.foodricion.domain.interactor.IsAuthenticatedInteractor
+import com.lans.foodricion.domain.interactor.SearchFoodByNameInteractor
 import com.lans.foodricion.domain.interactor.SendChatBotMessageInteractor
 import com.lans.foodricion.domain.interactor.SignInInteractor
 import com.lans.foodricion.domain.interactor.SignOutInteractor
@@ -45,6 +46,7 @@ import com.lans.foodricion.domain.usecase.GetFoodsUseCase
 import com.lans.foodricion.domain.usecase.GetImageTempUriUseCase
 import com.lans.foodricion.domain.usecase.GetMeUseCase
 import com.lans.foodricion.domain.usecase.IsAuthenticatedUseCase
+import com.lans.foodricion.domain.usecase.SearchFoodByNameUseCase
 import com.lans.foodricion.domain.usecase.SendChatbotMessageUseCase
 import com.lans.foodricion.domain.usecase.SignInUseCase
 import com.lans.foodricion.domain.usecase.SignOutUseCase
@@ -238,6 +240,12 @@ object AppModule {
     @Singleton
     fun provideGetFoodsUseCase(foodRepository: IFoodRepository): GetFoodsUseCase {
         return GetFoodsInteractor(foodRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSearchFoodByNameUseCase(): SearchFoodByNameUseCase {
+        return SearchFoodByNameInteractor()
     }
 
     @Provides

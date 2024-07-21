@@ -15,6 +15,7 @@ import com.lans.foodricion.presentation.screen.change_password.ChangePasswordScr
 import com.lans.foodricion.presentation.screen.chatbot.ChatBotScreen
 import com.lans.foodricion.presentation.screen.edit_profile.EditProfileScreen
 import com.lans.foodricion.presentation.screen.food.FoodScreen
+import com.lans.foodricion.presentation.screen.food_detail.FoodDetailScreen
 import com.lans.foodricion.presentation.screen.home.HomeScreen
 import com.lans.foodricion.presentation.screen.profile.ProfileScreen
 
@@ -135,7 +136,21 @@ fun MainNavGraph(
             FoodScreen(
                 navigateToHome = {
                     mainNavController.navigateUp()
+                },
+                navigateToFoodDetail = { foodName ->
+                    mainNavController.navigate(route = MainRoute.FoodDetailScreen.route + "/${foodName}") {
+                        popUpTo(route = MainRoute.FoodScreen.route)
+                    }
                 }
+            )
+        }
+        composable(route = MainRoute.FoodDetailScreen.route + "/{foodName}") {
+            val foodName = it.arguments?.getString("foodName") ?: ""
+            FoodDetailScreen(
+                navigateToFood = {
+                    mainNavController.navigateUp()
+                },
+                foodName = foodName
             )
         }
     }

@@ -5,7 +5,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -15,7 +14,6 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -37,7 +35,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.lans.foodricion.R
-import com.lans.foodricion.domain.model.InputWrapper
 import com.lans.foodricion.presentation.component.alert.Alert
 import com.lans.foodricion.presentation.component.food_item.FoodItem
 import com.lans.foodricion.presentation.component.textfield.ValidableTextField
@@ -48,7 +45,8 @@ import com.lans.foodricion.presentation.theme.Primary
 @Composable
 fun FoodScreen(
     viewModel: FoodViewModel = hiltViewModel(),
-    navigateToHome: () -> Unit
+    navigateToHome: () -> Unit,
+    navigateToFoodDetail: (foodName: String) -> Unit
 ) {
     val state by viewModel.state
     var showAlert by remember { mutableStateOf(Pair(false, "")) }
@@ -68,6 +66,10 @@ fun FoodScreen(
                 }
             }
         )
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.getFoods()
     }
 
     LaunchedEffect(key1 = state.error) {
@@ -121,7 +123,7 @@ fun FoodScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            input = InputWrapper(),
+            input = state.search,
             placeholder = "Search",
             isSupportiveText = false,
             trailingIcon = {
@@ -136,13 +138,15 @@ fun FoodScreen(
                 }
             },
             onValueChange = {
-
+                viewModel.onEvent(FoodUIEvent.SearchChanged(it))
             }
         )
         if (state.isLoading) {
-            Box(
+            Column(
                 modifier = Modifier
-                    .fillMaxHeight()
+                    .weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
                 CircularProgressIndicator(
                     modifier = Modifier
@@ -167,7 +171,9 @@ fun FoodScreen(
                         imgUrl = food.foodImage,
                         foodName = food.foodName,
                         calorie = food.foodCalories.toInt(),
-                        onClick = { }
+                        onClick = {
+                            navigateToFoodDetail.invoke(food.foodName)
+                        }
                     )
                 }
             }

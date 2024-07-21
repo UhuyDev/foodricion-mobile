@@ -6,24 +6,74 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lans.foodricion.data.Resource
 import com.lans.foodricion.domain.usecase.GetFoodsUseCase
+import com.lans.foodricion.domain.usecase.SearchFoodByNameUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class FoodViewModel @Inject constructor(
-    private val getFoodsUseCase: GetFoodsUseCase
+    private val getFoodsUseCase: GetFoodsUseCase,
+    private val searchFoodByNameUseCase: SearchFoodByNameUseCase
 ) : ViewModel() {
 
     private val _state = mutableStateOf(FoodUIState())
     val state: State<FoodUIState> get() = _state
 
-    init {
-        getFoods()
+    fun onEvent(event: FoodUIEvent) {
+        when (event) {
+            is FoodUIEvent.SearchChanged -> {
+                _state.value = _state.value.copy(
+                    search = _state.value.search.copy(
+                        value = event.search
+                    )
+                )
+
+                if (_state.value.foods.isEmpty()) {
+                    return
+                }
+
+                if (_state.value.search.value.isNotBlank()) {
+                    searchFood()
+                } else {
+                    getFoods()
+                }
+            }
+        }
     }
 
-    fun onEvent(event: FoodUIEvent) {
+    private fun searchFood() {
+        viewModelScope.launch {
+            searchFoodByNameUseCase.invoke(
+                foodList = _state.value.foodsDefault,
+                foodName = state.value.search.value
+            ).collect { response ->
+                when (response) {
+                    is Resource.Success -> {
+                        _state.value = _state.value.copy(
+                            foods = response.data,
+                            isLoading = false
+                        )
+                    }
 
+                    is Resource.Error -> {
+                        _state.value = _state.value.copy(
+                            foods = emptyList(),
+                            error = response.message,
+                            isLoading = false
+                        )
+                    }
+
+                    is Resource.Loading -> {
+                        _state.value = _state.value.copy(
+                            isLoading = true
+                        )
+                    }
+
+                    else -> Unit
+                }
+            }
+        }
     }
 
     fun getFoods() {
@@ -33,6 +83,7 @@ class FoodViewModel @Inject constructor(
                     is Resource.Success -> {
                         _state.value = _state.value.copy(
                             foods = response.data,
+                            foodsDefault = response.data,
                             isLoading = false
                         )
                     }
