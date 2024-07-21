@@ -93,8 +93,8 @@ fun MainNavGraph(
                             popUpTo(route = MainRoute.ProfileScreen.route)
                         }
                     },
-                    navigateToEditProfile = {
-                        mainNavController.navigate(route = MainRoute.EditProfileScreen.route) {
+                    navigateToEditProfile = { fullname, email ->
+                        mainNavController.navigate(route = MainRoute.EditProfileScreen.route + "/${fullname}/${email}") {
                             popUpTo(route = MainRoute.ProfileScreen.route)
                         }
                     },
@@ -113,11 +113,15 @@ fun MainNavGraph(
                 )
             }
         }
-        composable(route = MainRoute.EditProfileScreen.route) {
+        composable(route = MainRoute.EditProfileScreen.route + "/{fullname}/{email}") {
+            val fullname = it.arguments?.getString("fullname") ?: ""
+            val email = it.arguments?.getString("email") ?: ""
             EditProfileScreen(
                 navigateToProfile = {
                     mainNavController.navigateUp()
-                }
+                },
+                fullname = fullname,
+                email = email
             )
         }
         composable(route = MainRoute.ChangePasswordScreen.route) {

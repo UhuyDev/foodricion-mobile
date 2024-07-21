@@ -31,7 +31,7 @@ interface FoodricionApi {
         @Body requestBody: SignUpRequestDto,
     ): ApiResponse<SignUpResponseDto>
 
-    @POST("/update-profile")
+    @POST("/me/update-profile")
     suspend fun updateProfile(
         @Body requestBody: UpdateProfileRequestDto,
     ): ApiResponse<UpdateProfileResponseDto>

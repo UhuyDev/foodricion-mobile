@@ -50,7 +50,7 @@ fun ProfileScreen(
     isAuthenticated: Boolean,
     navigateToSignIn: () -> Unit,
     navigateToSignUp: () -> Unit,
-    navigateToEditProfile: () -> Unit,
+    navigateToEditProfile: (fullname: String, email: String) -> Unit,
     navigateToChangePassword: () -> Unit,
     signOut: () -> Unit
 ) {
@@ -201,7 +201,10 @@ fun ProfileScreen(
                             shape = CircleShape
                         ),
                     onClick = {
-                        navigateToEditProfile.invoke()
+                        navigateToEditProfile.invoke(
+                            state.user?.fullname ?: "",
+                            state.user?.email ?: ""
+                        )
                     }
                 ) {
                     Icon(

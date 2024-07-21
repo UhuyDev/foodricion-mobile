@@ -37,7 +37,7 @@ fun MainScreen(
             val isBottomBarVisible = currentRoute?.route !in listOf(
                 MainRoute.ChatBotScreen.route,
                 MainRoute.FoodScreen.route,
-                MainRoute.EditProfileScreen.route
+                MainRoute.EditProfileScreen.route + "/{fullname}/{email}"
             )
 
             if (isBottomBarVisible) {
