@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -24,9 +25,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.lans.foodricion.R
 import com.lans.foodricion.domain.model.InputWrapper
 import com.lans.foodricion.presentation.component.button.LoadingButton
@@ -37,14 +38,15 @@ import com.lans.foodricion.presentation.theme.Danger
 
 @Composable
 fun EditProfileScreen(
-//    viewModel: EditProfileViewModel = hiltViewModel(),
-//    innerPadding: PaddingValues
+    viewModel: EditProfileViewModel = hiltViewModel(),
+    navigateToProfile: () -> Unit
 ) {
     Column(
         modifier = Modifier
             .background(Background)
             .fillMaxSize()
-            .statusBarsPadding(),
+            .statusBarsPadding()
+            .navigationBarsPadding(),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         Column(
@@ -59,7 +61,12 @@ fun EditProfileScreen(
                 Icon(
                     modifier = Modifier
                         .size(48.dp)
-                        .clickable { },
+                        .padding(
+                            start = 16.dp
+                        )
+                        .clickable {
+                            navigateToProfile.invoke()
+                        },
                     painter = painterResource(id = R.drawable.ic_back),
                     tint = Black,
                     contentDescription = stringResource(id = R.string.content_description)
@@ -162,12 +169,6 @@ fun EditProfileScreen(
             )
         }
     }
-}
-
-@Preview
-@Composable
-fun EditProfileScreenPreview() {
-    EditProfileScreen()
 }
 
 

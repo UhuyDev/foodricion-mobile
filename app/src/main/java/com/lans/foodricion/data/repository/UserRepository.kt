@@ -3,7 +3,9 @@ package com.lans.foodricion.data.repository
 import com.lans.foodricion.data.Resource
 import com.lans.foodricion.data.source.network.SafeApiCall
 import com.lans.foodricion.data.source.network.api.FoodricionApi
+import com.lans.foodricion.data.source.network.dto.request.ChangePasswordRequestDto
 import com.lans.foodricion.data.source.network.dto.request.ForgotPasswordRequestDto
+import com.lans.foodricion.data.source.network.dto.request.UpdateProfileRequestDto
 import com.lans.foodricion.data.source.network.dto.request.VerifyOTPRequestDto
 import com.lans.foodricion.data.source.network.dto.response.toDomain
 import com.lans.foodricion.domain.model.User
@@ -25,12 +27,43 @@ class UserRepository @Inject constructor(
         }
     }
 
+    override suspend fun changePassword(
+        oldPassword: String,
+        newPassword: String
+    ): Flow<Resource<Boolean>> {
+        return flow {
+            emit(Resource.Loading)
+            emit(safeCall {
+                api.changePassword(
+                    ChangePasswordRequestDto(
+                        oldPassword = oldPassword,
+                        newPassword = newPassword
+                    )
+                ).code == 200
+            })
+        }
+    }
+
     override suspend fun forgotPassword(email: String): Flow<Resource<Boolean>> {
         return flow {
             emit(Resource.Loading)
             emit(safeCall {
                 api.forgotPassword(
                     ForgotPasswordRequestDto(
+                        email = email
+                    )
+                ).code == 200
+            })
+        }
+    }
+
+    override suspend fun updateProfile(fullname: String, email: String): Flow<Resource<Boolean>> {
+        return flow {
+            emit(Resource.Loading)
+            emit(safeCall {
+                api.updateProfile(
+                    UpdateProfileRequestDto(
+                        fullname = fullname,
                         email = email
                     )
                 ).code == 200

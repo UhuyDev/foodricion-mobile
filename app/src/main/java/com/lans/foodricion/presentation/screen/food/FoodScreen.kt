@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -16,6 +17,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -41,6 +43,7 @@ import com.lans.foodricion.presentation.component.food_item.FoodItem
 import com.lans.foodricion.presentation.component.textfield.ValidableTextField
 import com.lans.foodricion.presentation.theme.Background
 import com.lans.foodricion.presentation.theme.Black
+import com.lans.foodricion.presentation.theme.Primary
 
 @Composable
 fun FoodScreen(
@@ -48,7 +51,6 @@ fun FoodScreen(
     navigateToHome: () -> Unit
 ) {
     val state by viewModel.state
-    val foodListState = rememberLazyListState()
     var showAlert by remember { mutableStateOf(Pair(false, "")) }
 
     if (showAlert.first) {
@@ -94,6 +96,9 @@ fun FoodScreen(
             Icon(
                 modifier = Modifier
                     .size(48.dp)
+                    .padding(
+                        start = 16.dp
+                    )
                     .clickable {
                         navigateToHome.invoke()
                     }
@@ -134,24 +139,37 @@ fun FoodScreen(
 
             }
         )
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    start = 16.dp,
-                    bottom = 16.dp,
-                    end = 16.dp
-                ),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(state.foods) { food ->
-                FoodItem(
-                    modifier = Modifier,
-                    imgUrl = food.foodImage,
-                    foodName = food.foodName,
-                    calorie = 300,
-                    onClick = { }
+        if (state.isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .size(24.dp),
+                    color = Primary
                 )
+            }
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        start = 16.dp,
+                        bottom = 16.dp,
+                        end = 16.dp
+                    ),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(state.foods) { food ->
+                    FoodItem(
+                        modifier = Modifier,
+                        imgUrl = food.foodImage,
+                        foodName = food.foodName,
+                        calorie = food.foodCalories.toInt(),
+                        onClick = { }
+                    )
+                }
             }
         }
     }

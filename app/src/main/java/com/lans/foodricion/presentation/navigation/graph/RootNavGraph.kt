@@ -6,7 +6,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.lans.foodricion.presentation.navigation.NavGraph
 import com.lans.foodricion.presentation.screen.MainScreen
-import com.lans.foodricion.presentation.screen.profile.ProfileScreen
 
 @Composable
 fun RootNavGraph(

@@ -27,6 +27,7 @@ import com.lans.foodricion.presentation.theme.Black
 import com.lans.foodricion.presentation.theme.Danger
 import com.lans.foodricion.presentation.theme.PrimaryContainer
 import com.lans.foodricion.presentation.theme.RoundedLarge
+import com.lans.foodricion.presentation.theme.RoundedMedium
 import com.lans.foodricion.presentation.theme.Success
 import com.lans.foodricion.presentation.theme.White
 
@@ -40,7 +41,7 @@ fun FoodItem(
     onClick: () -> Unit
 ) {
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth(),
         colors = CardDefaults.cardColors(
             containerColor = PrimaryContainer
@@ -58,7 +59,10 @@ fun FoodItem(
         ) {
             AsyncImage(
                 modifier = Modifier
-                    .background(White)
+                    .background(
+                        color = White,
+                        shape = RoundedMedium
+                    )
                     .clip(RoundedLarge)
                     .size(50.dp),
                 model = imgUrl,

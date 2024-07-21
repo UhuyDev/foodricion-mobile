@@ -70,26 +70,31 @@ fun HomeScreen(
     val authority = stringResource(id = R.string.file_provider)
     val takePhotoLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture(),
-        onResult = {
-            state.tempUri = state.tempUri
-            state.rotation = 0
-            state.classifierResult = viewModel.classify(
-                MediaStore.Images.Media.getBitmap(context.contentResolver, state.tempUri),
-                state.rotation
-            )
-            showResult = true
+        onResult = { success ->
+            if (success) {
+                if (state.tempUri != Uri.EMPTY) {
+                    state.rotation = 0
+                    state.classifierResult = viewModel.classify(
+                        MediaStore.Images.Media.getBitmap(context.contentResolver, state.tempUri),
+                        state.rotation
+                    )
+                    showResult = true
+                }
+            }
         }
     )
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = {
-            state.tempUri = it!!
-            state.rotation = 0
-            state.classifierResult = viewModel.classify(
-                MediaStore.Images.Media.getBitmap(context.contentResolver, state.tempUri),
-                state.rotation
-            )
-            showResult = true
+            if (it != null) {
+                state.tempUri = it
+                state.rotation = 0
+                state.classifierResult = viewModel.classify(
+                    MediaStore.Images.Media.getBitmap(context.contentResolver, state.tempUri),
+                    state.rotation
+                )
+                showResult = true
+            }
         }
     )
     val cameraPermissionResultLauncher = rememberLauncherForActivityResult(
@@ -175,7 +180,10 @@ fun HomeScreen(
             )
     ) {
         DailyNutrition(
-            modifier = Modifier,
+            modifier = Modifier
+                .padding(
+                    top = 8.dp
+                ),
             calorieValue = 200f,
             calorieMaxValue = 1800f,
             proteinValue = 200f,

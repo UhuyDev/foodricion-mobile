@@ -50,6 +50,7 @@ fun ProfileScreen(
     isAuthenticated: Boolean,
     navigateToSignIn: () -> Unit,
     navigateToSignUp: () -> Unit,
+    navigateToEditProfile: () -> Unit,
     navigateToChangePassword: () -> Unit,
     signOut: () -> Unit
 ) {
@@ -119,6 +120,7 @@ fun ProfileScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(
+                    top = 8.dp,
                     bottom = 24.dp
                 ),
             text = stringResource(R.string.profile),
@@ -198,7 +200,9 @@ fun ProfileScreen(
                             color = PrimaryDark,
                             shape = CircleShape
                         ),
-                    onClick = {}
+                    onClick = {
+                        navigateToEditProfile.invoke()
+                    }
                 ) {
                     Icon(
                         modifier = Modifier

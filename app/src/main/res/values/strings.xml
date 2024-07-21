@@ -53,4 +53,5 @@
     <string name="delete">Delete</string>
     <string name="this_action_cannot_be_undone_and_you_will_lose_all_your_data_and_history_permanently">This action cannot be undone and you will lose all your data and history permanently.</string>
     <string name="delete_my_account">Delete My Account</string>
+    <string name="old_password">Old Password</string>
 </resources>

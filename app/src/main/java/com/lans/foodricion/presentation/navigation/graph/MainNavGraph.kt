@@ -13,6 +13,7 @@ import com.lans.foodricion.presentation.navigation.AuthRoute
 import com.lans.foodricion.presentation.navigation.MainRoute
 import com.lans.foodricion.presentation.screen.change_password.ChangePasswordScreen
 import com.lans.foodricion.presentation.screen.chatbot.ChatBotScreen
+import com.lans.foodricion.presentation.screen.edit_profile.EditProfileScreen
 import com.lans.foodricion.presentation.screen.food.FoodScreen
 import com.lans.foodricion.presentation.screen.home.HomeScreen
 import com.lans.foodricion.presentation.screen.profile.ProfileScreen
@@ -92,9 +93,14 @@ fun MainNavGraph(
                             popUpTo(route = MainRoute.ProfileScreen.route)
                         }
                     },
+                    navigateToEditProfile = {
+                        mainNavController.navigate(route = MainRoute.EditProfileScreen.route) {
+                            popUpTo(route = MainRoute.ProfileScreen.route)
+                        }
+                    },
                     navigateToChangePassword = {
                         mainNavController.navigate(route = MainRoute.ChangePasswordScreen.route) {
-                            popUpTo(route = MainRoute.ChangePasswordScreen.route)
+                            popUpTo(route = MainRoute.ProfileScreen.route)
                         }
                     },
                     signOut = {
@@ -106,6 +112,13 @@ fun MainNavGraph(
                     }
                 )
             }
+        }
+        composable(route = MainRoute.EditProfileScreen.route) {
+            EditProfileScreen(
+                navigateToProfile = {
+                    mainNavController.navigateUp()
+                }
+            )
         }
         composable(route = MainRoute.ChangePasswordScreen.route) {
             ChangePasswordScreen(

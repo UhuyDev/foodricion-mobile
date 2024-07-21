@@ -5,5 +5,6 @@ data class Food(
     val foodName: String,
     val foodImage: String,
     val foodType: String,
+    val foodCalories: Double,
     val foodNutrition: Nutrition
 )

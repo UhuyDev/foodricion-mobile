@@ -26,6 +26,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.lans.foodricion.domain.model.InputWrapper
+import com.lans.foodricion.presentation.theme.Danger
 import com.lans.foodricion.presentation.theme.Neutral
 import com.lans.foodricion.presentation.theme.Primary
 import com.lans.foodricion.presentation.theme.RoundedMedium
@@ -99,7 +100,9 @@ fun ValidableTextField(
                 supportingText = supportiveText,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedLabelColor = Primary,
-                    unfocusedLabelColor = Neutral
+                    unfocusedLabelColor = Neutral,
+                    errorLabelColor = Danger,
+                    errorSupportingTextColor = Danger
                 ),
                 contentPadding = OutlinedTextFieldDefaults.contentPadding(),
                 container = {

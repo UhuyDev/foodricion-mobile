@@ -13,6 +13,8 @@ data class GetFoodResponseDto(
     val foodImage: String? = null,
     @field:Json(name = "food_type")
     val foodType: String? = null,
+    @field:Json(name = "food_calories")
+    val foodCalories: Double,
     @field:Json(name = "nutrition_details")
     var foodNutrition: Nutrition? = null
 )
@@ -105,6 +107,7 @@ fun GetFoodResponseDto.toDomain(): Food {
         foodName = foodName,
         foodImage = foodImage ?: "",
         foodType = foodType ?: "",
+        foodCalories = foodCalories,
         foodNutrition = nutrition
     )
 }

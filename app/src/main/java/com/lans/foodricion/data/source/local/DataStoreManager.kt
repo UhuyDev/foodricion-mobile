@@ -31,7 +31,6 @@ class DataStoreManager @Inject constructor(private val context: Context) {
 
     fun getAccessToken(): Flow<String> {
         return context.dataStore.data.map { preferences ->
-            Log.d("TOKEN", "intercept: " + preferences[ACCESS_TOKEN])
             preferences[ACCESS_TOKEN] ?: ""
         }
     }

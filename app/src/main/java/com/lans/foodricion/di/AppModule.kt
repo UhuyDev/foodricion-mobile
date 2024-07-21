@@ -11,6 +11,7 @@ import com.lans.foodricion.data.source.network.AuthAuthenticator
 import com.lans.foodricion.data.source.network.AuthInterceptor
 import com.lans.foodricion.data.source.network.api.FoodricionApi
 import com.lans.foodricion.data.tensorflow.TfLiteClassifier
+import com.lans.foodricion.domain.interactor.ChangePasswordInteractor
 import com.lans.foodricion.domain.interactor.ForgotPasswordInteractor
 import com.lans.foodricion.domain.interactor.GetChatbotHistoryInteractor
 import com.lans.foodricion.domain.interactor.GetFoodByNameInteractor
@@ -23,6 +24,7 @@ import com.lans.foodricion.domain.interactor.SignInInteractor
 import com.lans.foodricion.domain.interactor.SignOutInteractor
 import com.lans.foodricion.domain.interactor.SignUpInteractor
 import com.lans.foodricion.domain.interactor.StoreSessionInteractor
+import com.lans.foodricion.domain.interactor.UpdateProfileInteractor
 import com.lans.foodricion.domain.interactor.VerifyOTPInteractor
 import com.lans.foodricion.domain.interactor.validator.ValidateConfirmPasswordInteractor
 import com.lans.foodricion.domain.interactor.validator.ValidateEmailInteractor
@@ -35,6 +37,7 @@ import com.lans.foodricion.domain.repository.IChatbotRepository
 import com.lans.foodricion.domain.repository.IFoodRepository
 import com.lans.foodricion.domain.repository.IUserRepository
 import com.lans.foodricion.domain.tensorflow.FoodClassifier
+import com.lans.foodricion.domain.usecase.ChangePasswordUseCase
 import com.lans.foodricion.domain.usecase.ForgotPasswordUseCase
 import com.lans.foodricion.domain.usecase.GetChatbotHistoryUseCase
 import com.lans.foodricion.domain.usecase.GetFoodByNameUseCase
@@ -47,6 +50,7 @@ import com.lans.foodricion.domain.usecase.SignInUseCase
 import com.lans.foodricion.domain.usecase.SignOutUseCase
 import com.lans.foodricion.domain.usecase.SignUpUseCase
 import com.lans.foodricion.domain.usecase.StoreSessionUseCase
+import com.lans.foodricion.domain.usecase.UpdateProfileUseCase
 import com.lans.foodricion.domain.usecase.VerifyOTPUseCase
 import com.lans.foodricion.domain.usecase.validator.ValidateConfirmPasswordUseCase
 import com.lans.foodricion.domain.usecase.validator.ValidateEmailUseCase
@@ -184,8 +188,20 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideChangePasswordUseCase(userRepository: UserRepository): ChangePasswordUseCase {
+        return ChangePasswordInteractor(userRepository)
+    }
+
+    @Provides
+    @Singleton
     fun provideForgotPasswordUseCase(userRepository: UserRepository): ForgotPasswordUseCase {
         return ForgotPasswordInteractor(userRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideUpdateProfileUseCase(userRepository: IUserRepository): UpdateProfileUseCase {
+        return UpdateProfileInteractor(userRepository)
     }
 
     @Provides

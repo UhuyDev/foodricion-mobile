@@ -34,14 +34,18 @@ fun MainScreen(
     }
     Scaffold(
         bottomBar = {
-            if (currentRoute?.route != MainRoute.ChatBotScreen.route && currentRoute?.route != MainRoute.FoodScreen.route) {
+            val isBottomBarVisible = currentRoute?.route !in listOf(
+                MainRoute.ChatBotScreen.route,
+                MainRoute.FoodScreen.route,
+                MainRoute.EditProfileScreen.route
+            )
+
+            if (isBottomBarVisible) {
                 BottomNavigationBar(
                     selectedItem = lastSelectedRoute,
                     navigateToHome = {
                         mainNavController.navigate(MainRoute.HomeScreen.route) {
-                            popUpTo(route = MainRoute.HomeScreen.route) {
-                                inclusive = true
-                            }
+                            popUpTo(MainRoute.HomeScreen.route) { inclusive = true }
                         }
                         lastSelectedRoute = MainRoute.HomeScreen
                     },
@@ -50,9 +54,7 @@ fun MainScreen(
                     },
                     navigateToProfile = {
                         mainNavController.navigate(MainRoute.ProfileScreen.route) {
-                            popUpTo(route = MainRoute.ProfileScreen.route) {
-                                inclusive = true
-                            }
+                            popUpTo(MainRoute.ProfileScreen.route) { inclusive = true }
                         }
                         lastSelectedRoute = MainRoute.ProfileScreen
                     },
