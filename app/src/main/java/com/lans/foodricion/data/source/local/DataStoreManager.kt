@@ -1,7 +1,6 @@
 package com.lans.foodricion.data.source.local
 
 import android.content.Context
-import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -45,7 +44,7 @@ class DataStoreManager @Inject constructor(private val context: Context) {
         return context.dataStore.data.map { preferences ->
             val expired = preferences[EXPIRED_AT]
             if (expired != null) {
-                expired <= System.currentTimeMillis()
+                expired <= System.currentTimeMillis() / 1000
             } else {
                 false
             }

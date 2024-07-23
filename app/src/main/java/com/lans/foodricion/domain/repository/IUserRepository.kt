@@ -9,5 +9,6 @@ interface IUserRepository {
     suspend fun changePassword(oldPassword: String, newPassword: String): Flow<Resource<Boolean>>
     suspend fun forgotPassword(email: String): Flow<Resource<Boolean>>
     suspend fun updateProfile(fullname: String, email: String): Flow<Resource<Boolean>>
+    suspend fun updateProfileMetrics(age: Int, height: Int, weight: Int): Flow<Resource<Boolean>>
     suspend fun verifyOTP(email: String, otp: String, newPassword: String): Flow<Resource<Boolean>>
 }

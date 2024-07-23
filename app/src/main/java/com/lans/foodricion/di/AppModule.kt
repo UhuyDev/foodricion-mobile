@@ -27,6 +27,7 @@ import com.lans.foodricion.domain.interactor.SignOutInteractor
 import com.lans.foodricion.domain.interactor.SignUpInteractor
 import com.lans.foodricion.domain.interactor.StoreSessionInteractor
 import com.lans.foodricion.domain.interactor.UpdateProfileInteractor
+import com.lans.foodricion.domain.interactor.UpdateProfileMetricsInteractor
 import com.lans.foodricion.domain.interactor.VerifyOTPInteractor
 import com.lans.foodricion.domain.interactor.validator.ValidateConfirmPasswordInteractor
 import com.lans.foodricion.domain.interactor.validator.ValidateEmailInteractor
@@ -54,6 +55,7 @@ import com.lans.foodricion.domain.usecase.SignInUseCase
 import com.lans.foodricion.domain.usecase.SignOutUseCase
 import com.lans.foodricion.domain.usecase.SignUpUseCase
 import com.lans.foodricion.domain.usecase.StoreSessionUseCase
+import com.lans.foodricion.domain.usecase.UpdateProfileMetricsUseCase
 import com.lans.foodricion.domain.usecase.UpdateProfileUseCase
 import com.lans.foodricion.domain.usecase.VerifyOTPUseCase
 import com.lans.foodricion.domain.usecase.validator.ValidateConfirmPasswordUseCase
@@ -206,6 +208,12 @@ object AppModule {
     @Singleton
     fun provideUpdateProfileUseCase(userRepository: IUserRepository): UpdateProfileUseCase {
         return UpdateProfileInteractor(userRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideUpdateProfileMetricsUseCase(userRepository: IUserRepository): UpdateProfileMetricsUseCase {
+        return UpdateProfileMetricsInteractor(userRepository)
     }
 
     @Provides

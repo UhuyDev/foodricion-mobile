@@ -6,6 +6,7 @@ import com.lans.foodricion.data.source.network.dto.request.ChatbotRequestDto
 import com.lans.foodricion.data.source.network.dto.request.ForgotPasswordRequestDto
 import com.lans.foodricion.data.source.network.dto.request.SignInRequestDto
 import com.lans.foodricion.data.source.network.dto.request.SignUpRequestDto
+import com.lans.foodricion.data.source.network.dto.request.UpdateProfileMetricsRequestDto
 import com.lans.foodricion.data.source.network.dto.request.UpdateProfileRequestDto
 import com.lans.foodricion.data.source.network.dto.request.VerifyOTPRequestDto
 import com.lans.foodricion.data.source.network.dto.response.ChatbotHistoryResponseDto
@@ -14,6 +15,7 @@ import com.lans.foodricion.data.source.network.dto.response.MeResponseDto
 import com.lans.foodricion.data.source.network.dto.response.RefreshTokenResponseDto
 import com.lans.foodricion.data.source.network.dto.response.SignInResponseDto
 import com.lans.foodricion.data.source.network.dto.response.SignUpResponseDto
+import com.lans.foodricion.data.source.network.dto.response.UpdateProfileMetricsResponseDto
 import com.lans.foodricion.data.source.network.dto.response.UpdateProfileResponseDto
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -35,6 +37,11 @@ interface FoodricionApi {
     suspend fun updateProfile(
         @Body requestBody: UpdateProfileRequestDto,
     ): ApiResponse<UpdateProfileResponseDto>
+
+    @POST("/me/update-metrics")
+    suspend fun updateProfileMetrics(
+        @Body requestBody: UpdateProfileMetricsRequestDto,
+    ): ApiResponse<UpdateProfileMetricsResponseDto>
 
     @GET("/me")
     suspend fun me(): ApiResponse<MeResponseDto>

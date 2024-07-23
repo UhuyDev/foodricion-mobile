@@ -5,6 +5,7 @@ import com.lans.foodricion.data.source.network.SafeApiCall
 import com.lans.foodricion.data.source.network.api.FoodricionApi
 import com.lans.foodricion.data.source.network.dto.request.ChangePasswordRequestDto
 import com.lans.foodricion.data.source.network.dto.request.ForgotPasswordRequestDto
+import com.lans.foodricion.data.source.network.dto.request.UpdateProfileMetricsRequestDto
 import com.lans.foodricion.data.source.network.dto.request.UpdateProfileRequestDto
 import com.lans.foodricion.data.source.network.dto.request.VerifyOTPRequestDto
 import com.lans.foodricion.data.source.network.dto.response.toDomain
@@ -69,6 +70,25 @@ class UserRepository @Inject constructor(
                     UpdateProfileRequestDto(
                         fullname = fullname,
                         email = email
+                    )
+                ).code == 200
+            })
+        }
+    }
+
+    override suspend fun updateProfileMetrics(
+        age: Int,
+        height: Int,
+        weight: Int
+    ): Flow<Resource<Boolean>> {
+        return flow {
+            emit(Resource.Loading)
+            emit(safeCall {
+                api.updateProfileMetrics(
+                    UpdateProfileMetricsRequestDto(
+                        age = age,
+                        height = height,
+                        weight = weight
                     )
                 ).code == 200
             })

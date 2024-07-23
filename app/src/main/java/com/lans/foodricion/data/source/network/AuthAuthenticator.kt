@@ -22,50 +22,63 @@ class AuthAuthenticator @Inject constructor(
     private val dataStoreManager: DataStoreManager
 ) : Authenticator, SafeApiCall {
     override fun authenticate(route: Route?, response: Response): Request? {
+        val isTokenExpired = runBlocking {
+            dataStoreManager.checkTokenExpiration().first()
+        }
+
+        val currentAccessToken = runBlocking {
+            dataStoreManager.getAccessToken().first()
+        }
+
         val currentRefreshToken = runBlocking {
             dataStoreManager.getRefreshToken().first()
         }
 
-        synchronized(this) {
-            val newToken = runBlocking {
-                safeCall {
-                    refreshToken(currentRefreshToken)
-                }
-            }
-
-            var refreshTokenResponse: RefreshTokenResponseDto? = null
-
-            when (newToken) {
-                is Resource.Success -> {
-                    refreshTokenResponse = newToken.data.data
+        return if (!isTokenExpired) {
+            response.request.newBuilder()
+                .header(HEADER_AUTHORIZATION, "$TOKEN_TYPE $currentAccessToken")
+                .build()
+        } else {
+            synchronized(this) {
+                val newToken = runBlocking {
+                    safeCall { refreshToken(currentRefreshToken) }
                 }
 
-                is Resource.Error -> {
-                    runBlocking {
-                        dataStoreManager.clear()
+                when (newToken) {
+                    is Resource.Success -> {
+                        val refreshTokenResponse = newToken.data.data
+                        runBlocking {
+                            dataStoreManager.storeData(
+                                DataStoreManager.ACCESS_TOKEN,
+                                refreshTokenResponse!!.accessToken
+                            )
+                            dataStoreManager.storeData(
+                                DataStoreManager.REFRESH_TOKEN,
+                                refreshTokenResponse.refreshToken
+                            )
+                            dataStoreManager.storeData(
+                                DataStoreManager.EXPIRED_AT,
+                                refreshTokenResponse.expiredAt
+                            )
+                        }
+
+                        response.request.newBuilder()
+                            .header(
+                                HEADER_AUTHORIZATION,
+                                "$TOKEN_TYPE ${refreshTokenResponse!!.accessToken}"
+                            )
+                            .build()
                     }
-                    return null
+
+                    is Resource.Error -> {
+                        runBlocking {
+                            dataStoreManager.clear()
+                        }
+                        null
+                    }
+
+                    else -> null
                 }
-
-                else -> Unit
-            }
-
-            refreshTokenResponse.let { body ->
-                runBlocking {
-                    dataStoreManager.storeData(
-                        DataStoreManager.ACCESS_TOKEN,
-                        body!!.accessToken
-                    )
-                    dataStoreManager.storeData(
-                        DataStoreManager.REFRESH_TOKEN,
-                        body.refreshToken
-                    )
-                    dataStoreManager.storeData(DataStoreManager.EXPIRED_AT, body.expiredAt)
-                }
-
-                return response.request.newBuilder()
-                    .header(HEADER_AUTHORIZATION, "$TOKEN_TYPE ${body!!.accessToken}")
-                    .build()
             }
         }
     }

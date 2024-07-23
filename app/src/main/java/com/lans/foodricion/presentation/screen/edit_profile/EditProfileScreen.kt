@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -32,6 +33,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -50,6 +52,9 @@ fun EditProfileScreen(
     navigateToProfile: () -> Unit,
     fullname: String,
     email: String,
+    age: String,
+    height: String,
+    weight: String
 ) {
     val context = LocalContext.current
     val state by viewModel.state
@@ -58,25 +63,23 @@ fun EditProfileScreen(
     }
 
     if (showAlert.first) {
-        Alert(
-            title = "Error",
-            description = showAlert.second,
-            onDismissClick = {
+        Alert(title = "Error", description = showAlert.second, onDismissClick = {
+            showAlert = showAlert.copy(first = false)
+        }, onConfirmClick = {
+            Button(onClick = {
                 showAlert = showAlert.copy(first = false)
-            },
-            onConfirmClick = {
-                Button(onClick = {
-                    showAlert = showAlert.copy(first = false)
-                }) {
-                    Text(text = "Close")
-                }
+            }) {
+                Text(text = "Close")
             }
-        )
+        })
     }
 
     LaunchedEffect(Unit) {
         state.fullname.value = fullname
         state.email.value = email
+        state.age.value = age
+        state.height.value = height
+        state.weight.value = weight
     }
 
     LaunchedEffect(key1 = state.isSuccess, key2 = state.error) {
@@ -97,8 +100,7 @@ fun EditProfileScreen(
             .background(Background)
             .fillMaxSize()
             .statusBarsPadding()
-            .navigationBarsPadding(),
-        verticalArrangement = Arrangement.SpaceBetween
+            .navigationBarsPadding(), verticalArrangement = Arrangement.SpaceBetween
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
@@ -137,73 +139,102 @@ fun EditProfileScreen(
                 )
             }
             Box(
-                modifier = Modifier
-                    .padding(
-                        vertical = 16.dp
-                    ),
-                contentAlignment = Alignment.Center
+                modifier = Modifier.padding(
+                    vertical = 16.dp
+                ), contentAlignment = Alignment.Center
             ) {
                 Image(
-                    modifier = Modifier
-                        .size(100.dp),
+                    modifier = Modifier.size(100.dp),
                     painter = painterResource(id = R.drawable.ic_profile),
                     contentDescription = stringResource(id = R.string.content_description)
                 )
             }
-            ValidableTextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        horizontal = 24.dp
-                    ),
+            ValidableTextField(modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    horizontal = 24.dp
+                ),
                 input = state.fullname,
                 label = stringResource(R.string.name),
                 onValueChange = {
                     viewModel.onEvent(EditProfileUIEvent.FullnameChanged(it))
-                }
-            )
+                })
             Spacer(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(16.dp)
+                    .height(8.dp)
             )
-            ValidableTextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        horizontal = 24.dp
-                    ),
+            ValidableTextField(modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    horizontal = 24.dp
+                ),
                 input = state.email,
                 label = stringResource(R.string.email),
                 onValueChange = {
                     viewModel.onEvent(EditProfileUIEvent.EmailChanged(it))
-                }
-            )
+                })
             Spacer(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(16.dp)
+                    .height(8.dp)
             )
-            LoadingButton(
+            ValidableTextField(modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    horizontal = 24.dp
+                ),
+                input = state.age,
+                label = stringResource(R.string.age),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                onValueChange = {
+                    viewModel.onEvent(EditProfileUIEvent.AgeChanged(it))
+                })
+            Spacer(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(48.dp)
-                    .padding(
-                        horizontal = 24.dp
-                    ),
-                text = stringResource(R.string.update),
-                isLoading = false,
-                onClick = {
-                    viewModel.onEvent(EditProfileUIEvent.SubmitButtonClicked)
-                }
+                    .height(8.dp)
             )
+            ValidableTextField(modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    horizontal = 24.dp
+                ),
+                input = state.height,
+                label = stringResource(R.string.height),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                onValueChange = {
+                    viewModel.onEvent(EditProfileUIEvent.HeightChanged(it))
+                })
+            Spacer(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(8.dp)
+            )
+            ValidableTextField(modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    horizontal = 24.dp
+                ),
+                input = state.weight,
+                label = stringResource(R.string.weight),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                onValueChange = {
+                    viewModel.onEvent(EditProfileUIEvent.WeightChanged(it))
+                })
+            LoadingButton(modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp)
+                .padding(
+                    horizontal = 24.dp
+                ), text = stringResource(R.string.update), isLoading = false, onClick = {
+                viewModel.onEvent(EditProfileUIEvent.SubmitButtonClicked)
+            })
         }
         Column(
-            modifier = Modifier
-                .padding(
-                    bottom = 16.dp
-                ),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier.padding(
+                bottom = 16.dp
+            ), horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 modifier = Modifier.padding(horizontal = 16.dp),
@@ -219,20 +250,19 @@ fun EditProfileScreen(
                 color = Black,
                 fontSize = 14.sp
             )
-            LoadingButton(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp)
-                    .padding(
-                        horizontal = 16.dp
-                    ),
+            Spacer(modifier = Modifier.height(8.dp))
+            LoadingButton(modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp)
+                .padding(
+                    horizontal = 16.dp
+                ),
                 text = stringResource(R.string.delete),
                 containerColor = Danger,
                 isLoading = false,
                 onClick = {
                     viewModel.onEvent(EditProfileUIEvent.DeleteButtonClicked)
-                }
-            )
+                })
         }
     }
 }

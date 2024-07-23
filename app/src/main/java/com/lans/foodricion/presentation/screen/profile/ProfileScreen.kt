@@ -50,7 +50,7 @@ fun ProfileScreen(
     isAuthenticated: Boolean,
     navigateToSignIn: () -> Unit,
     navigateToSignUp: () -> Unit,
-    navigateToEditProfile: (fullname: String, email: String) -> Unit,
+    navigateToEditProfile: (fullname: String, email: String, age: String, height: String, weight: String) -> Unit,
     navigateToChangePassword: () -> Unit,
     signOut: () -> Unit
 ) {
@@ -203,7 +203,10 @@ fun ProfileScreen(
                     onClick = {
                         navigateToEditProfile.invoke(
                             state.user?.fullname ?: "",
-                            state.user?.email ?: ""
+                            state.user?.email ?: "",
+                            state.user?.userMetric?.age.toString(),
+                            state.user?.userMetric?.height.toString(),
+                            state.user?.userMetric?.weight.toString()
                         )
                     }
                 ) {
