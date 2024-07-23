@@ -22,7 +22,11 @@ class UserRepository @Inject constructor(
             emit(Resource.Loading)
             emit(safeCall {
                 val response = api.me()
-                response.toDomain()
+                if (response.code == 200) {
+                    response.data!!.toDomain()
+                } else {
+                    throw Exception("User not found")
+                }
             })
         }
     }

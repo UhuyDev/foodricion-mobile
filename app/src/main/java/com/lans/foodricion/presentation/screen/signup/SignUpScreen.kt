@@ -221,7 +221,7 @@ fun SignUpScreen(
             )
             TextButton(
                 modifier = Modifier,
-                text = stringResource(R.string.sign_in),
+                text = stringResource(R.string.sign_up),
                 color = Secondary,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,

@@ -1,12 +1,12 @@
 package com.lans.foodricion.data.source.network.api
 
 import com.lans.foodricion.data.source.network.dto.ApiResponse
-import com.lans.foodricion.data.source.network.dto.request.UpdateProfileRequestDto
 import com.lans.foodricion.data.source.network.dto.request.ChangePasswordRequestDto
 import com.lans.foodricion.data.source.network.dto.request.ChatbotRequestDto
 import com.lans.foodricion.data.source.network.dto.request.ForgotPasswordRequestDto
 import com.lans.foodricion.data.source.network.dto.request.SignInRequestDto
 import com.lans.foodricion.data.source.network.dto.request.SignUpRequestDto
+import com.lans.foodricion.data.source.network.dto.request.UpdateProfileRequestDto
 import com.lans.foodricion.data.source.network.dto.request.VerifyOTPRequestDto
 import com.lans.foodricion.data.source.network.dto.response.ChatbotHistoryResponseDto
 import com.lans.foodricion.data.source.network.dto.response.GetFoodResponseDto
@@ -37,7 +37,7 @@ interface FoodricionApi {
     ): ApiResponse<UpdateProfileResponseDto>
 
     @GET("/me")
-    suspend fun me(): MeResponseDto
+    suspend fun me(): ApiResponse<MeResponseDto>
 
     @POST("/refresh-token")
     suspend fun refreshToken(

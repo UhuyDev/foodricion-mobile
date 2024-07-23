@@ -63,4 +63,6 @@
     <string name="score">Score</string>
     <string name="category">Category</string>
     <string name="bmi_calculator">BMI Calculator</string>
+    <string name="unknown">Unknown</string>
+    <string name="check_nutrition">Check Nutrition</string>
 </resources>

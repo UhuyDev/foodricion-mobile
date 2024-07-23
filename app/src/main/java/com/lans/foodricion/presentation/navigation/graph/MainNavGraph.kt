@@ -34,8 +34,18 @@ fun MainNavGraph(
         composable(route = MainRoute.HomeScreen.route) {
             HomeScreen(
                 innerPadding = innerPadding,
+                navigateToSignIn = {
+                    rootNavController.navigate(route = AuthRoute.SignInScreen.route) {
+                        popUpTo(route = MainRoute.HomeScreen.route)
+                    }
+                },
                 navigateToFood = {
                     mainNavController.navigate(route = MainRoute.FoodScreen.route) {
+                        popUpTo(route = MainRoute.HomeScreen.route)
+                    }
+                },
+                navigateToFoodDetail = { foodName ->
+                    mainNavController.navigate(route = MainRoute.FoodDetailScreen.route + "/${foodName}") {
                         popUpTo(route = MainRoute.HomeScreen.route)
                     }
                 },

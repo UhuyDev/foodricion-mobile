@@ -15,19 +15,23 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -47,17 +51,21 @@ import com.lans.foodricion.presentation.component.bottom_sheet.ScanResultBottomS
 import com.lans.foodricion.presentation.component.button.CardButton
 import com.lans.foodricion.presentation.component.daily_nutrition.DailyNutrition
 import com.lans.foodricion.presentation.component.food_item.FoodItem
+import com.lans.foodricion.presentation.component.unauthenticated_message.UnauthenticatedMessage
 import com.lans.foodricion.presentation.theme.Background
 import com.lans.foodricion.presentation.theme.Black
 import com.lans.foodricion.presentation.theme.Primary
 import com.lans.foodricion.presentation.theme.PrimaryContainer
 import com.lans.foodricion.utils.getActivity
+import java.util.Locale
 
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     innerPadding: PaddingValues,
+    navigateToSignIn: () -> Unit,
     navigateToFood: () -> Unit,
+    navigateToFoodDetail: (foodName: String) -> Unit,
     navigateToBMI: () -> Unit,
     isAuthenticated: Boolean
 ) {
@@ -111,10 +119,22 @@ fun HomeScreen(
     )
 
     if (showResult) {
+        val result = if (state.classifierResult.isNotEmpty()) {
+            state.classifierResult[0].name.replaceFirstChar {
+                if (it.isLowerCase()) it.titlecase(
+                    Locale.getDefault()
+                ) else it.toString()
+            }
+        } else stringResource(
+            R.string.unknown
+        )
         ScanResultBottomSheet(
             modifier = Modifier,
             imgUri = state.tempUri,
-            result = state.classifierResult.toString(),
+            result = result,
+            onCheckNutritionClick = {
+                navigateToFoodDetail.invoke(result)
+            },
             onDismissClick = {
                 showResult = false
                 state.classifierResult = emptyList()
@@ -180,22 +200,42 @@ fun HomeScreen(
                 bottom = innerPadding.calculateBottomPadding()
             )
     ) {
-        DailyNutrition(
-            modifier = Modifier
-                .padding(
-                    top = 8.dp
-                ),
-            calorieValue = 200f,
-            calorieMaxValue = 1800f,
-            proteinValue = 200f,
-            proteinMaxValue = 1800f,
-            carboValue = 200f,
-            carboMaxValue = 1800f,
-            fiberValue = 200f,
-            fiberMaxValue = 1800f,
-            fatValue = 200f,
-            fatMaxValue = 1800f
-        )
+        if (!isAuthenticated) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        start = 24.dp,
+                        top = 8.dp,
+                        end = 24.dp
+                    )
+                    .weight(1f),
+                colors = CardDefaults.cardColors(
+                    containerColor = PrimaryContainer
+                )
+            ) {
+                UnauthenticatedMessage {
+                    navigateToSignIn.invoke()
+                }
+            }
+        } else {
+            DailyNutrition(
+                modifier = Modifier
+                    .padding(
+                        top = 8.dp
+                    ),
+                calorieValue = 200f,
+                calorieMaxValue = 1800f,
+                proteinValue = 200f,
+                proteinMaxValue = 1800f,
+                carboValue = 200f,
+                carboMaxValue = 1800f,
+                fiberValue = 200f,
+                fiberMaxValue = 1800f,
+                fatValue = 200f,
+                fatMaxValue = 1800f
+            )
+        }
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -237,78 +277,98 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(
-                    start = 24.dp,
-                    end = 24.dp
+                    horizontal = 24.dp
                 )
                 .weight(1f),
             colors = CardDefaults.cardColors(
                 containerColor = PrimaryContainer
             )
         ) {
-            Text(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        top = 16.dp,
-                        bottom = 12.dp
-                    ),
-                text = stringResource(R.string._29_jan_2024),
-                color = Black,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
-            )
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .verticalScroll(rememberScrollState())
-                    .padding(
-                        start = 12.dp,
-                        end = 12.dp,
-                        bottom = 16.dp
-                    ),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                FoodItem(
-                    modifier = Modifier,
-                    foodName = "Example",
-                    imgUrl = "",
-                    calorie = 220,
-                    isHistory = true,
-                    onClick = { }
-                )
-                FoodItem(
-                    modifier = Modifier,
-                    foodName = "Example",
-                    imgUrl = "",
-                    calorie = 220,
-                    isHistory = true,
-                    onClick = { }
-                )
-                FoodItem(
-                    modifier = Modifier,
-                    foodName = "Example",
-                    imgUrl = "",
-                    calorie = 220,
-                    isHistory = true,
-                    onClick = { }
-                )
-                FoodItem(
-                    modifier = Modifier,
-                    foodName = "Example",
-                    imgUrl = "",
-                    calorie = 220,
-                    isHistory = true,
-                    onClick = { }
-                )
-                FoodItem(
-                    modifier = Modifier,
-                    foodName = "Example",
-                    imgUrl = "",
-                    calorie = 220,
-                    isHistory = true,
-                    onClick = { }
-                )
+            if (state.isLoading) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .size(24.dp),
+                        color = Primary
+                    )
+                }
+            } else {
+                if (!isAuthenticated) {
+                    UnauthenticatedMessage {
+                        navigateToSignIn.invoke()
+                    }
+                } else {
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                top = 16.dp
+                            ),
+                        text = stringResource(R.string._29_jan_2024),
+                        color = Black,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center
+                    )
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .verticalScroll(rememberScrollState())
+                            .padding(
+                                start = 12.dp,
+                                top = 12.dp,
+                                end = 12.dp,
+                                bottom = 16.dp
+                            ),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        FoodItem(
+                            modifier = Modifier,
+                            foodName = "Example",
+                            imgUrl = "",
+                            calorie = 220,
+                            isHistory = true,
+                            onClick = { }
+                        )
+                        FoodItem(
+                            modifier = Modifier,
+                            foodName = "Example",
+                            imgUrl = "",
+                            calorie = 220,
+                            isHistory = true,
+                            onClick = { }
+                        )
+                        FoodItem(
+                            modifier = Modifier,
+                            foodName = "Example",
+                            imgUrl = "",
+                            calorie = 220,
+                            isHistory = true,
+                            onClick = { }
+                        )
+                        FoodItem(
+                            modifier = Modifier,
+                            foodName = "Example",
+                            imgUrl = "",
+                            calorie = 220,
+                            isHistory = true,
+                            onClick = { }
+                        )
+                        FoodItem(
+                            modifier = Modifier,
+                            foodName = "Example",
+                            imgUrl = "",
+                            calorie = 220,
+                            isHistory = true,
+                            onClick = { }
+                        )
+                    }
+                }
             }
         }
     }

@@ -2,30 +2,17 @@ package com.lans.foodricion.data.tensorflow
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.util.Log
-import android.view.Surface
 import com.lans.foodricion.domain.model.Classification
 import com.lans.foodricion.domain.tensorflow.FoodClassifier
-import com.lans.foodricion.ml.FoodModel
-import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
 import org.tensorflow.lite.support.common.FileUtil
-import org.tensorflow.lite.support.common.ops.NormalizeOp
-import org.tensorflow.lite.support.image.ImageProcessor
-import org.tensorflow.lite.support.image.TensorImage
-import org.tensorflow.lite.support.image.ops.ResizeOp
-import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
-import org.tensorflow.lite.task.core.BaseOptions
-import org.tensorflow.lite.task.core.vision.ImageProcessingOptions
-import org.tensorflow.lite.task.vision.classifier.ImageClassifier
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
-import kotlin.math.log
 
 class TfLiteClassifier(
     val context: Context
 ) : FoodClassifier {
-    private val modelPath = "foodModel.tflite"
+    private val modelPath = "foodricionModel.tflite"
     private val labelPath = "labels.txt"
 
     private lateinit var interpreter: Interpreter
@@ -33,7 +20,7 @@ class TfLiteClassifier(
 
     private fun setup() {
         val model = FileUtil.loadMappedFile(context, modelPath)
-        interpreter =   Interpreter(model)
+        interpreter = Interpreter(model)
         labels = FileUtil.loadLabels(context, labelPath)
     }
 
@@ -52,10 +39,18 @@ class TfLiteClassifier(
         byteBuffer.order(ByteOrder.nativeOrder())
 
         val pixels = IntArray(inputWidth * inputHeight)
-        resizedImage.getPixels(pixels, 0, resizedImage.width, 0, 0, resizedImage.width, resizedImage.height)
+        resizedImage.getPixels(
+            pixels,
+            0,
+            resizedImage.width,
+            0,
+            0,
+            resizedImage.width,
+            resizedImage.height
+        )
         var pixel = 0
         for (i in 0 until 200) {
-            for (j in 0 until 150) {
+            for (j in 0 until 200) {
                 val value = pixels[pixel++]
                 byteBuffer.putFloat((value shr 16 and 0xFF) / 127.5f)
                 byteBuffer.putFloat((value shr 8 and 0xFF) / 127.5f)
