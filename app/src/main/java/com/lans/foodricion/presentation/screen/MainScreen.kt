@@ -38,7 +38,7 @@ fun MainScreen(
                 MainRoute.ChatBotScreen.route,
                 MainRoute.FoodScreen.route,
                 MainRoute.FoodDetailScreen.route + "/{foodName}",
-                MainRoute.EditProfileScreen.route + "/{fullname}/{email}",
+                MainRoute.EditProfileScreen.route + "/{fullname}/{email}/{age}/{height}/{weight}",
                 MainRoute.BMIScreen.route
             )
 

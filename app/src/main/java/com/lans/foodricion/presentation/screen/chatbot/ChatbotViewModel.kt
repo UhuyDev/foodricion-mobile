@@ -23,10 +23,6 @@ class ChatbotViewModel @Inject constructor(
     private val _state = mutableStateOf(ChatbotUIState())
     val state: State<ChatbotUIState> get() = _state
 
-    init {
-        getMessages()
-    }
-
     fun onEvent(event: ChatbotUIEvent) {
         when (event) {
             is ChatbotUIEvent.MessageChanged -> {

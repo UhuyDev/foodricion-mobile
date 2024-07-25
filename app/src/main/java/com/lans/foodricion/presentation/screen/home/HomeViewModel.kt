@@ -5,14 +5,19 @@ import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.lans.foodricion.data.Resource
 import com.lans.foodricion.domain.model.Classification
 import com.lans.foodricion.domain.tensorflow.FoodClassifier
 import com.lans.foodricion.domain.usecase.GetImageTempUriUseCase
+import com.lans.foodricion.domain.usecase.GetMeUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
+    private val getMeUseCase: GetMeUseCase,
     private val getImageTempUriUseCase: GetImageTempUriUseCase,
     private val foodClassifier: FoodClassifier
 ) : ViewModel() {
@@ -29,5 +34,36 @@ class HomeViewModel @Inject constructor(
     fun classify(bitmap: Bitmap, rotation: Int): List<Classification> {
         Log.d("CLASSIFIER", foodClassifier.classify(bitmap, rotation).toString())
         return foodClassifier.classify(bitmap, rotation)
+    }
+
+    fun getMe() {
+        viewModelScope.launch {
+            getMeUseCase.invoke().collect { response ->
+                when (response) {
+                    is Resource.Success -> {
+                        _state.value = _state.value.copy(
+                            user = response.data,
+                            isLoading = false
+                        )
+                    }
+
+                    is Resource.Error -> {
+                        _state.value = _state.value.copy(
+                            user = null,
+                            error = response.message,
+                            isLoading = false
+                        )
+                    }
+
+                    is Resource.Loading -> {
+                        _state.value = _state.value.copy(
+                            isLoading = true
+                        )
+                    }
+
+                    else -> Unit
+                }
+            }
+        }
     }
 }

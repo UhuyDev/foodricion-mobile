@@ -39,6 +39,11 @@ fun MainNavGraph(
                         popUpTo(route = MainRoute.HomeScreen.route)
                     }
                 },
+                navigateToEditProfile = { fullname, email, age, height, weight ->
+                    mainNavController.navigate(route = MainRoute.EditProfileScreen.route + "/$fullname/$email/$age/$height/$weight") {
+                        popUpTo(route = MainRoute.HomeScreen.route)
+                    }
+                },
                 navigateToFood = {
                     mainNavController.navigate(route = MainRoute.FoodScreen.route) {
                         popUpTo(route = MainRoute.HomeScreen.route)

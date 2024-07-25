@@ -97,6 +97,10 @@ fun ChatBotScreen(
 
     LaunchedEffect(key1 = isAuthenticated) {
         showUnauthenticated = !isAuthenticated
+
+        if(isAuthenticated){
+            viewModel.getMessages()
+        }
     }
 
     LaunchedEffect(key1 = state.messages.size, key2 = state.isMessageSent, key3 = state.error) {

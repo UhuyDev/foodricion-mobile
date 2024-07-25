@@ -20,13 +20,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,6 +55,7 @@ import com.lans.foodricion.presentation.component.food_item.FoodItem
 import com.lans.foodricion.presentation.component.unauthenticated_message.UnauthenticatedMessage
 import com.lans.foodricion.presentation.theme.Background
 import com.lans.foodricion.presentation.theme.Black
+import com.lans.foodricion.presentation.theme.Neutral
 import com.lans.foodricion.presentation.theme.Primary
 import com.lans.foodricion.presentation.theme.PrimaryContainer
 import com.lans.foodricion.utils.getActivity
@@ -64,6 +66,7 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     innerPadding: PaddingValues,
     navigateToSignIn: () -> Unit,
+    navigateToEditProfile: (fullname: String, email: String, age: String, height: String, weight: String) -> Unit,
     navigateToFood: () -> Unit,
     navigateToFoodDetail: (foodName: String) -> Unit,
     navigateToBMI: () -> Unit,
@@ -192,6 +195,28 @@ fun HomeScreen(
             })
     }
 
+    LaunchedEffect(key1 = isAuthenticated) {
+        if (isAuthenticated) {
+            viewModel.getMe()
+        }
+    }
+
+    LaunchedEffect(key1 = state.user) {
+        val user = state.user
+        if (user != null) {
+            if (user.userMetric.age == 0) {
+                navigateToEditProfile.invoke(
+                    user.fullname,
+                    user.email,
+                    user.userMetric.age.toString(),
+                    user.userMetric.height.toString(),
+                    user.userMetric.weight.toString()
+                )
+                state.user = null
+            }
+        }
+    }
+
     Column(
         modifier = Modifier
             .background(Background)
@@ -315,58 +340,46 @@ fun HomeScreen(
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center
                     )
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .verticalScroll(rememberScrollState())
-                            .padding(
-                                start = 12.dp,
-                                top = 12.dp,
-                                end = 12.dp,
-                                bottom = 16.dp
-                            ),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        FoodItem(
-                            modifier = Modifier,
-                            foodName = "Example",
-                            imgUrl = "",
-                            calorie = 220,
-                            isHistory = true,
-                            onClick = { }
-                        )
-                        FoodItem(
-                            modifier = Modifier,
-                            foodName = "Example",
-                            imgUrl = "",
-                            calorie = 220,
-                            isHistory = true,
-                            onClick = { }
-                        )
-                        FoodItem(
-                            modifier = Modifier,
-                            foodName = "Example",
-                            imgUrl = "",
-                            calorie = 220,
-                            isHistory = true,
-                            onClick = { }
-                        )
-                        FoodItem(
-                            modifier = Modifier,
-                            foodName = "Example",
-                            imgUrl = "",
-                            calorie = 220,
-                            isHistory = true,
-                            onClick = { }
-                        )
-                        FoodItem(
-                            modifier = Modifier,
-                            foodName = "Example",
-                            imgUrl = "",
-                            calorie = 220,
-                            isHistory = true,
-                            onClick = { }
-                        )
+                    if (state.nutritionHistory.isEmpty()) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                text = stringResource(R.string.no_history_data),
+                                color = Neutral,
+                                fontSize = 14.sp,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(
+                                    start = 12.dp,
+                                    top = 12.dp,
+                                    end = 12.dp,
+                                    bottom = 16.dp
+                                ),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            items(state.nutritionHistory) { food ->
+                                FoodItem(
+                                    modifier = Modifier,
+                                    imgUrl = food.foodImage,
+                                    foodName = food.foodName,
+                                    calorie = food.foodCalories.toInt(),
+                                    onClick = {
+                                        navigateToFoodDetail.invoke(food.foodName)
+                                    }
+                                )
+                            }
+                        }
                     }
                 }
             }
