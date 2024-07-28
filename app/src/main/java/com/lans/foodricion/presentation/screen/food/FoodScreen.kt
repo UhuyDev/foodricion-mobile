@@ -168,11 +168,15 @@ fun FoodScreen(
                 items(state.foods) { food ->
                     FoodItem(
                         modifier = Modifier,
+                        dailyNutritionId = 0,
                         imgUrl = food.foodImage,
                         foodName = food.foodName,
                         calorie = food.foodCalories.toInt(),
                         onClick = {
                             navigateToFoodDetail.invoke(food.foodName)
+                        },
+                        onIconClick = {
+
                         }
                     )
                 }

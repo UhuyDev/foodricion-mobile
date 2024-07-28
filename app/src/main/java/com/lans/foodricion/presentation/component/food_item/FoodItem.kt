@@ -34,11 +34,13 @@ import com.lans.foodricion.presentation.theme.White
 @Composable
 fun FoodItem(
     modifier: Modifier,
+    dailyNutritionId: Int,
     imgUrl: String,
     foodName: String = "",
     calorie: Int = 0,
     isHistory: Boolean = false,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onIconClick: () -> Unit
 ) {
     Card(
         modifier = modifier
@@ -90,7 +92,7 @@ fun FoodItem(
                     .weight(1f)
             )
             IconButton(
-                onClick = onClick
+                onClick = onIconClick
             ) {
                 Icon(
                     painter = if (isHistory) painterResource(id = R.drawable.ic_minus) else painterResource(

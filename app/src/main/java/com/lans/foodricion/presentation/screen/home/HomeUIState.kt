@@ -2,7 +2,7 @@ package com.lans.foodricion.presentation.screen.home
 
 import android.net.Uri
 import com.lans.foodricion.domain.model.Classification
-import com.lans.foodricion.domain.model.Food
+import com.lans.foodricion.domain.model.DailyNutrition
 import com.lans.foodricion.domain.model.User
 
 data class HomeUIState(
@@ -11,6 +11,7 @@ data class HomeUIState(
     val isLoading: Boolean = false,
     var error: String = "",
     var classifierResult: List<Classification> = emptyList(),
-    val nutritionHistory: List<Food> = emptyList(),
-    var user: User? = null
+    val nutritionHistory: List<DailyNutrition> = emptyList(),
+    var user: User? = null,
+    var isHistoryDeleted: Boolean = false
 )

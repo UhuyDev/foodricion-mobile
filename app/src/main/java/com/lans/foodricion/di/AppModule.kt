@@ -4,6 +4,7 @@ import android.content.Context
 import com.lans.foodricion.common.Constant.BASE_URL
 import com.lans.foodricion.data.repository.AuthRepository
 import com.lans.foodricion.data.repository.ChatbotRepository
+import com.lans.foodricion.data.repository.DailyNutritionRepository
 import com.lans.foodricion.data.repository.FoodRepository
 import com.lans.foodricion.data.repository.UserRepository
 import com.lans.foodricion.data.source.local.DataStoreManager
@@ -11,10 +12,13 @@ import com.lans.foodricion.data.source.network.AuthAuthenticator
 import com.lans.foodricion.data.source.network.AuthInterceptor
 import com.lans.foodricion.data.source.network.api.FoodricionApi
 import com.lans.foodricion.data.tensorflow.TfLiteClassifier
+import com.lans.foodricion.domain.interactor.AddDailyNutritionInteractor
 import com.lans.foodricion.domain.interactor.CalculateBMIInteractor
 import com.lans.foodricion.domain.interactor.ChangePasswordInteractor
+import com.lans.foodricion.domain.interactor.DeleteDailyNutritionInteractor
 import com.lans.foodricion.domain.interactor.ForgotPasswordInteractor
 import com.lans.foodricion.domain.interactor.GetChatbotHistoryInteractor
+import com.lans.foodricion.domain.interactor.GetDailyNutritionsInteractor
 import com.lans.foodricion.domain.interactor.GetFoodByNameInteractor
 import com.lans.foodricion.domain.interactor.GetFoodsInteractor
 import com.lans.foodricion.domain.interactor.GetImageTempUriInteractor
@@ -37,13 +41,17 @@ import com.lans.foodricion.domain.interactor.validator.ValidatePasswordInteracto
 import com.lans.foodricion.domain.interactor.validator.ValidatorInteractor
 import com.lans.foodricion.domain.repository.IAuthRepository
 import com.lans.foodricion.domain.repository.IChatbotRepository
+import com.lans.foodricion.domain.repository.IDailyNutritionRepository
 import com.lans.foodricion.domain.repository.IFoodRepository
 import com.lans.foodricion.domain.repository.IUserRepository
 import com.lans.foodricion.domain.tensorflow.FoodClassifier
+import com.lans.foodricion.domain.usecase.AddDailyNutritionUseCase
 import com.lans.foodricion.domain.usecase.CalculateBMIUseCase
 import com.lans.foodricion.domain.usecase.ChangePasswordUseCase
+import com.lans.foodricion.domain.usecase.DeleteDailyNutritionUseCase
 import com.lans.foodricion.domain.usecase.ForgotPasswordUseCase
 import com.lans.foodricion.domain.usecase.GetChatbotHistoryUseCase
+import com.lans.foodricion.domain.usecase.GetDailyNutritionsUseCase
 import com.lans.foodricion.domain.usecase.GetFoodByNameUseCase
 import com.lans.foodricion.domain.usecase.GetFoodsUseCase
 import com.lans.foodricion.domain.usecase.GetImageTempUriUseCase
@@ -158,6 +166,14 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideDailyNutritionRepository(
+        api: FoodricionApi
+    ): IDailyNutritionRepository {
+        return DailyNutritionRepository(api)
+    }
+
+    @Provides
+    @Singleton
     fun provideSignInUseCase(authRepository: IAuthRepository): SignInUseCase {
         return SignInInteractor(authRepository)
     }
@@ -262,6 +278,24 @@ object AppModule {
     @Singleton
     fun provideCalculateBMIUseCase(): CalculateBMIUseCase {
         return CalculateBMIInteractor()
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetDailyNutritionsUseCase(dailyNutritionRepository: IDailyNutritionRepository): GetDailyNutritionsUseCase {
+        return GetDailyNutritionsInteractor(dailyNutritionRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAddDailyNutritionUseCase(dailyNutritionRepository: IDailyNutritionRepository): AddDailyNutritionUseCase {
+        return AddDailyNutritionInteractor(dailyNutritionRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDeleteDailyNutritionUseCase(dailyNutritionRepository: IDailyNutritionRepository): DeleteDailyNutritionUseCase {
+        return DeleteDailyNutritionInteractor(dailyNutritionRepository)
     }
 
     @Provides

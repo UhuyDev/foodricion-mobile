@@ -9,6 +9,8 @@ import androidx.lifecycle.viewModelScope
 import com.lans.foodricion.data.Resource
 import com.lans.foodricion.domain.model.Classification
 import com.lans.foodricion.domain.tensorflow.FoodClassifier
+import com.lans.foodricion.domain.usecase.DeleteDailyNutritionUseCase
+import com.lans.foodricion.domain.usecase.GetDailyNutritionsUseCase
 import com.lans.foodricion.domain.usecase.GetImageTempUriUseCase
 import com.lans.foodricion.domain.usecase.GetMeUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,6 +21,8 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val getMeUseCase: GetMeUseCase,
     private val getImageTempUriUseCase: GetImageTempUriUseCase,
+    private val getDailyNutritionsUseCase: GetDailyNutritionsUseCase,
+    private val deleteDailyNutritionUseCase: DeleteDailyNutritionUseCase,
     private val foodClassifier: FoodClassifier
 ) : ViewModel() {
 
@@ -64,6 +68,69 @@ class HomeViewModel @Inject constructor(
                     else -> Unit
                 }
             }
+        }
+    }
+
+    fun getDailyNutritions() {
+        viewModelScope.launch {
+            getDailyNutritionsUseCase.invoke().collect { response ->
+                when (response) {
+                    is Resource.Success -> {
+                        _state.value = _state.value.copy(
+                            nutritionHistory = response.data,
+                            isLoading = false
+                        )
+                    }
+
+                    is Resource.Error -> {
+                        _state.value = _state.value.copy(
+                            nutritionHistory = emptyList(),
+                            error = response.message,
+                            isLoading = false
+                        )
+                    }
+
+                    is Resource.Loading -> {
+                        _state.value = _state.value.copy(
+                            isLoading = true
+                        )
+                    }
+
+                    else -> Unit
+                }
+            }
+        }
+    }
+
+    fun deleteDailyNutrition(dailyNutritionId: Int) {
+        viewModelScope.launch {
+            deleteDailyNutritionUseCase.invoke(dailyNutritionId = dailyNutritionId)
+                .collect { response ->
+                    when (response) {
+                        is Resource.Success -> {
+                            _state.value = _state.value.copy(
+                                isHistoryDeleted = true,
+                                isLoading = false
+                            )
+                        }
+
+                        is Resource.Error -> {
+                            _state.value = _state.value.copy(
+                                isHistoryDeleted = false,
+                                error = response.message,
+                                isLoading = false
+                            )
+                        }
+
+                        is Resource.Loading -> {
+                            _state.value = _state.value.copy(
+                                isLoading = true
+                            )
+                        }
+
+                        else -> Unit
+                    }
+                }
         }
     }
 }

@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -45,6 +46,7 @@ import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.lans.foodricion.R
+import com.lans.foodricion.presentation.component.alert.Alert
 import com.lans.foodricion.presentation.component.alert.CameraPermissionTextProvider
 import com.lans.foodricion.presentation.component.alert.PermissionAlert
 import com.lans.foodricion.presentation.component.bottom_sheet.ScanBottomSheet
@@ -59,6 +61,7 @@ import com.lans.foodricion.presentation.theme.Neutral
 import com.lans.foodricion.presentation.theme.Primary
 import com.lans.foodricion.presentation.theme.PrimaryContainer
 import com.lans.foodricion.utils.getActivity
+import com.lans.foodricion.utils.getMinimumNutrition
 import java.util.Locale
 
 @Composable
@@ -77,6 +80,24 @@ fun HomeScreen(
     var showPermissionAlert by remember { mutableStateOf(false) }
     var showBottomSheet by remember { mutableStateOf(false) }
     var showResult by remember { mutableStateOf(false) }
+    var showAlert by remember { mutableStateOf(Pair(false, "")) }
+
+    if (showAlert.first) {
+        Alert(
+            title = "Error",
+            description = showAlert.second,
+            onDismissClick = {
+                showAlert = showAlert.copy(first = false)
+            },
+            onConfirmClick = {
+                Button(onClick = {
+                    showAlert = showAlert.copy(first = false)
+                }) {
+                    Text(text = "Close")
+                }
+            }
+        )
+    }
 
     val permission = Manifest.permission.CAMERA
     val authority = stringResource(id = R.string.file_provider)
@@ -198,6 +219,7 @@ fun HomeScreen(
     LaunchedEffect(key1 = isAuthenticated) {
         if (isAuthenticated) {
             viewModel.getMe()
+            viewModel.getDailyNutritions()
         }
     }
 
@@ -214,6 +236,25 @@ fun HomeScreen(
                 )
                 state.user = null
             }
+        }
+    }
+
+    LaunchedEffect(
+        key1 = state.nutritionHistory.size,
+        key2 = state.isHistoryDeleted,
+        key3 = state.error
+    ) {
+        if (isAuthenticated) {
+            if (state.isHistoryDeleted) {
+                viewModel.getDailyNutritions()
+                state.isHistoryDeleted = false
+            }
+        }
+
+        val error = state.error
+        if (error.isNotBlank()) {
+            showAlert = Pair(true, state.error)
+            state.error = ""
         }
     }
 
@@ -244,22 +285,46 @@ fun HomeScreen(
                 }
             }
         } else {
-            DailyNutrition(
-                modifier = Modifier
-                    .padding(
-                        top = 8.dp
-                    ),
-                calorieValue = 200f,
-                calorieMaxValue = 1800f,
-                proteinValue = 200f,
-                proteinMaxValue = 1800f,
-                carboValue = 200f,
-                carboMaxValue = 1800f,
-                fiberValue = 200f,
-                fiberMaxValue = 1800f,
-                fatValue = 200f,
-                fatMaxValue = 1800f
-            )
+            if (state.nutritionHistory.isNotEmpty()) {
+                val minimumNutrition = getMinimumNutrition(state.user!!.userMetric.age)
+                DailyNutrition(
+                    modifier = Modifier
+                        .padding(
+                            top = 8.dp
+                        ),
+                    calorieValue = state.nutritionHistory.sumOf { it.foodNutrition.energy }
+                        .toFloat(),
+                    calorieMaxValue = minimumNutrition.calorie.toFloat(),
+                    proteinValue = state.nutritionHistory.sumOf { it.foodNutrition.protein }
+                        .toFloat(),
+                    proteinMaxValue = minimumNutrition.protein.toFloat(),
+                    carboValue = state.nutritionHistory.sumOf { it.foodNutrition.totalCarbohydrate }
+                        .toFloat(),
+                    carboMaxValue = minimumNutrition.carbohydrate.toFloat(),
+                    fiberValue = state.nutritionHistory.sumOf { it.foodNutrition.dietaryFiber }
+                        .toFloat(),
+                    fiberMaxValue = minimumNutrition.fiber.toFloat(),
+                    fatValue = state.nutritionHistory.sumOf { it.foodNutrition.totalFat }.toFloat(),
+                    fatMaxValue = minimumNutrition.fat.toFloat()
+                )
+            } else {
+                DailyNutrition(
+                    modifier = Modifier
+                        .padding(
+                            top = 8.dp
+                        ),
+                    calorieValue = 200f,
+                    calorieMaxValue = 1800f,
+                    proteinValue = 200f,
+                    proteinMaxValue = 1800f,
+                    carboValue = 200f,
+                    carboMaxValue = 1800f,
+                    fiberValue = 200f,
+                    fiberMaxValue = 1800f,
+                    fatValue = 200f,
+                    fatMaxValue = 1800f
+                )
+            }
         }
         Row(
             modifier = Modifier
@@ -334,7 +399,7 @@ fun HomeScreen(
                             .padding(
                                 top = 16.dp
                             ),
-                        text = stringResource(R.string._29_jan_2024),
+                        text = stringResource(R.string.daily_food_history),
                         color = Black,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
@@ -368,14 +433,19 @@ fun HomeScreen(
                                 ),
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            items(state.nutritionHistory) { food ->
+                            items(state.nutritionHistory) { history ->
                                 FoodItem(
                                     modifier = Modifier,
-                                    imgUrl = food.foodImage,
-                                    foodName = food.foodName,
-                                    calorie = food.foodCalories.toInt(),
+                                    dailyNutritionId = history.dailyNutritionId,
+                                    imgUrl = history.foodImage,
+                                    foodName = history.foodName,
+                                    calorie = history.foodNutrition.energy.toInt(),
+                                    isHistory = true,
                                     onClick = {
-                                        navigateToFoodDetail.invoke(food.foodName)
+                                        navigateToFoodDetail.invoke(history.foodName)
+                                    },
+                                    onIconClick = {
+                                        viewModel.deleteDailyNutrition(history.dailyNutritionId)
                                     }
                                 )
                             }
