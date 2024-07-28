@@ -8,5 +8,6 @@ data class FoodUIState(
     val isLoading: Boolean = false,
     var error: String = "",
     var foods: List<Food> = emptyList(),
-    var foodsDefault: List<Food> = emptyList()
+    var foodsDefault: List<Food> = emptyList(),
+    var isDailyNutritionAdded: Boolean = false
 )

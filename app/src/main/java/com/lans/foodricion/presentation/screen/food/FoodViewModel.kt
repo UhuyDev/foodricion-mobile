@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lans.foodricion.data.Resource
+import com.lans.foodricion.domain.usecase.AddDailyNutritionUseCase
 import com.lans.foodricion.domain.usecase.GetFoodsUseCase
 import com.lans.foodricion.domain.usecase.SearchFoodByNameUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,6 +15,7 @@ import javax.inject.Inject
 @HiltViewModel
 class FoodViewModel @Inject constructor(
     private val getFoodsUseCase: GetFoodsUseCase,
+    private val addDailyNutritionUseCase: AddDailyNutritionUseCase,
     private val searchFoodByNameUseCase: SearchFoodByNameUseCase
 ) : ViewModel() {
 
@@ -105,6 +107,38 @@ class FoodViewModel @Inject constructor(
                     else -> Unit
                 }
             }
+        }
+    }
+
+    fun addDailyNutrition(foodName: String) {
+        viewModelScope.launch {
+            addDailyNutritionUseCase.invoke(foodName = foodName)
+                .collect { response ->
+                    when (response) {
+                        is Resource.Success -> {
+                            _state.value = _state.value.copy(
+                                isDailyNutritionAdded = true,
+                                isLoading = false
+                            )
+                        }
+
+                        is Resource.Error -> {
+                            _state.value = _state.value.copy(
+                                isDailyNutritionAdded = false,
+                                error = response.message,
+                                isLoading = false
+                            )
+                        }
+
+                        is Resource.Loading -> {
+                            _state.value = _state.value.copy(
+                                isLoading = true
+                            )
+                        }
+
+                        else -> Unit
+                    }
+                }
         }
     }
 }
