@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.MediaStore
 import android.provider.Settings
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -17,11 +18,13 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -220,6 +223,7 @@ fun HomeScreen(
         if (isAuthenticated) {
             viewModel.getMe()
             viewModel.getDailyNutritions()
+            viewModel.getFoodRecommendation()
         }
     }
 
@@ -240,31 +244,45 @@ fun HomeScreen(
     }
 
     LaunchedEffect(
-        key1 = state.nutritionHistory.size,
+        key1 = state.isDailyNutritionAdded,
         key2 = state.isHistoryDeleted,
         key3 = state.error
     ) {
         if (isAuthenticated) {
+            if (state.isDailyNutritionAdded) {
+                Toast.makeText(context, "Added to daily nutrition", Toast.LENGTH_SHORT).show()
+                viewModel.getDailyNutritions()
+                viewModel.getFoodRecommendation()
+                state.isDailyNutritionAdded = false
+            }
             if (state.isHistoryDeleted) {
                 viewModel.getDailyNutritions()
+                viewModel.getFoodRecommendation()
                 state.isHistoryDeleted = false
             }
         }
 
         val error = state.error
         if (error.isNotBlank()) {
-            showAlert = Pair(true, state.error)
-            state.error = ""
+            if (error != "HTTP 404 Not Found") {
+                if (error != "HTTP 401") {
+                    if(error != "HTTP 401 "){
+                        if (error != "HTTP 404 ") {
+                            showAlert = Pair(true, state.error)
+                            state.error = ""
+                        }
+                    }
+                }
+            }
         }
     }
 
     Column(
         modifier = Modifier
             .background(Background)
-            .statusBarsPadding()
-            .padding(
-                bottom = innerPadding.calculateBottomPadding()
-            )
+            .padding(innerPadding)
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
     ) {
         if (!isAuthenticated) {
             Card(
@@ -313,16 +331,16 @@ fun HomeScreen(
                         .padding(
                             top = 8.dp
                         ),
-                    calorieValue = 200f,
-                    calorieMaxValue = 1800f,
-                    proteinValue = 200f,
-                    proteinMaxValue = 1800f,
-                    carboValue = 200f,
-                    carboMaxValue = 1800f,
-                    fiberValue = 200f,
-                    fiberMaxValue = 1800f,
-                    fatValue = 200f,
-                    fatMaxValue = 1800f
+                    calorieValue = 0f,
+                    calorieMaxValue = 0f,
+                    proteinValue = 0f,
+                    proteinMaxValue = 0f,
+                    carboValue = 0f,
+                    carboMaxValue = 0f,
+                    fiberValue = 0f,
+                    fiberMaxValue = 0f,
+                    fatValue = 0f,
+                    fatMaxValue = 0f
                 )
             }
         }
@@ -363,13 +381,101 @@ fun HomeScreen(
                 }
             )
         }
+        if (state.foodRecommendation.isNotEmpty()) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(300.dp)
+                    .padding(
+                        start = 24.dp,
+                        end = 24.dp,
+                        bottom = 16.dp
+                    ),
+                colors = CardDefaults.cardColors(
+                    containerColor = PrimaryContainer
+                )
+            ) {
+                if (state.isLoading) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .size(24.dp),
+                            color = Primary
+                        )
+                    }
+                } else {
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                top = 16.dp
+                            ),
+                        text = stringResource(R.string.food_recommendation),
+                        color = Black,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center
+                    )
+                    if (state.nutritionHistory.isEmpty()) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                text = stringResource(R.string.no_history_data),
+                                color = Neutral,
+                                fontSize = 14.sp,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(
+                                    start = 12.dp,
+                                    top = 12.dp,
+                                    end = 12.dp,
+                                    bottom = 16.dp
+                                ),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            items(state.foodRecommendation) { recommendation ->
+                                FoodItem(
+                                    modifier = Modifier,
+                                    dailyNutritionId = 0,
+                                    imgUrl = recommendation.foodImage,
+                                    foodName = recommendation.foodName,
+                                    calorie = recommendation.foodNutrition.energy.toInt(),
+                                    onClick = {
+                                        navigateToFoodDetail.invoke(recommendation.foodName)
+                                    },
+                                    onIconClick = {
+                                        viewModel.addDailyNutrition(recommendation.foodName)
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
         Card(
             modifier = Modifier
                 .fillMaxWidth()
+                .height(300.dp)
                 .padding(
                     horizontal = 24.dp
-                )
-                .weight(1f),
+                ),
             colors = CardDefaults.cardColors(
                 containerColor = PrimaryContainer
             )

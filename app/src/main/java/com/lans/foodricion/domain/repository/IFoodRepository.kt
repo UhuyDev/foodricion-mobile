@@ -7,4 +7,5 @@ import kotlinx.coroutines.flow.Flow
 interface IFoodRepository {
     suspend fun getFood(foodName: String): Flow<Resource<Food>>
     suspend fun getFoods(): Flow<Resource<List<Food>>>
+    suspend fun getFoodRecommendation(): Flow<Resource<List<Food>>>
 }

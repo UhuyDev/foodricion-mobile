@@ -42,4 +42,20 @@ class FoodRepository @Inject constructor(
             })
         }
     }
+
+    override suspend fun getFoodRecommendation(): Flow<Resource<List<Food>>> {
+        return flow {
+            emit(Resource.Loading)
+            emit(safeCall {
+                val response = api.getFoodRecommendation()
+                if (response.code == 200) {
+                    response.data?.map { food ->
+                        food.toDomain()
+                    } ?: emptyList()
+                } else {
+                    throw Exception("Something went wrong")
+                }
+            })
+        }
+    }
 }

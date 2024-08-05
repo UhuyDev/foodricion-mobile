@@ -13,6 +13,7 @@ import com.lans.foodricion.data.source.network.dto.request.UpdateProfileRequestD
 import com.lans.foodricion.data.source.network.dto.request.VerifyOTPRequestDto
 import com.lans.foodricion.data.source.network.dto.response.AddUserDailyNutritionResponseDto
 import com.lans.foodricion.data.source.network.dto.response.ChatbotHistoryResponseDto
+import com.lans.foodricion.data.source.network.dto.response.GetFoodRecommendationResponseDto
 import com.lans.foodricion.data.source.network.dto.response.GetFoodResponseDto
 import com.lans.foodricion.data.source.network.dto.response.MeResponseDto
 import com.lans.foodricion.data.source.network.dto.response.RefreshTokenResponseDto
@@ -86,6 +87,8 @@ interface FoodricionApi {
 
     @GET("/foods")
     suspend fun getFoods(): ApiResponse<List<GetFoodResponseDto>>
+    @GET("/recommendations/daily")
+    suspend fun getFoodRecommendation(): ApiResponse<List<GetFoodRecommendationResponseDto>>
 
     @GET("/bookmarks")
     suspend fun getDailyNutritions(): ApiResponse<List<UserDailyNutritionResponseDto>>

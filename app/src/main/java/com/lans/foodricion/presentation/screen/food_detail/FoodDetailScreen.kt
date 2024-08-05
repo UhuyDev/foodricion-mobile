@@ -86,9 +86,10 @@ fun FoodDetailScreen(
         if(state.isDailyNutritionAdded) {
             Toast.makeText(context, "Added to daily nutrition", Toast.LENGTH_SHORT).show()
             state.isDailyNutritionAdded = false
+            navigateToFood.invoke()
         }
 
-        if (error.isNotBlank()) {
+        if (error.isNotBlank() && error != "HTTP 404 Not Found") {
             showAlert = Pair(true, state.error)
             state.error = ""
         }

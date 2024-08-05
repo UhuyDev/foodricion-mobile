@@ -20,6 +20,7 @@ import com.lans.foodricion.domain.interactor.ForgotPasswordInteractor
 import com.lans.foodricion.domain.interactor.GetChatbotHistoryInteractor
 import com.lans.foodricion.domain.interactor.GetDailyNutritionsInteractor
 import com.lans.foodricion.domain.interactor.GetFoodByNameInteractor
+import com.lans.foodricion.domain.interactor.GetFoodRecommendationInteractor
 import com.lans.foodricion.domain.interactor.GetFoodsInteractor
 import com.lans.foodricion.domain.interactor.GetImageTempUriInteractor
 import com.lans.foodricion.domain.interactor.GetMeInteractor
@@ -56,6 +57,7 @@ import com.lans.foodricion.domain.usecase.GetFoodByNameUseCase
 import com.lans.foodricion.domain.usecase.GetFoodsUseCase
 import com.lans.foodricion.domain.usecase.GetImageTempUriUseCase
 import com.lans.foodricion.domain.usecase.GetMeUseCase
+import com.lans.foodricion.domain.usecase.GetRecommendationFoodUseCase
 import com.lans.foodricion.domain.usecase.IsAuthenticatedUseCase
 import com.lans.foodricion.domain.usecase.SearchFoodByNameUseCase
 import com.lans.foodricion.domain.usecase.SendChatbotMessageUseCase
@@ -266,6 +268,12 @@ object AppModule {
     @Singleton
     fun provideGetFoodsUseCase(foodRepository: IFoodRepository): GetFoodsUseCase {
         return GetFoodsInteractor(foodRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetFoodRecommendationUseCase(foodRepository: IFoodRepository): GetRecommendationFoodUseCase {
+        return GetFoodRecommendationInteractor(foodRepository)
     }
 
     @Provides
