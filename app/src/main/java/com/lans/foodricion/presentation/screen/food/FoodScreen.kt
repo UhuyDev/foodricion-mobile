@@ -48,7 +48,8 @@ import com.lans.foodricion.presentation.theme.Primary
 fun FoodScreen(
     viewModel: FoodViewModel = hiltViewModel(),
     navigateToHome: () -> Unit,
-    navigateToFoodDetail: (foodName: String) -> Unit
+    navigateToFoodDetail: (foodName: String) -> Unit,
+    isAuthenticated: Boolean
 ) {
     val context = LocalContext.current
     val state by viewModel.state
@@ -180,6 +181,7 @@ fun FoodScreen(
                         imgUrl = food.foodImage,
                         foodName = food.foodName,
                         calorie = food.foodCalories.toInt(),
+                        isHasButton = isAuthenticated,
                         onClick = {
                             navigateToFoodDetail.invoke(food.foodName)
                         },

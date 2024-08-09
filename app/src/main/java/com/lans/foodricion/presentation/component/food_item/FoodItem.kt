@@ -39,6 +39,7 @@ fun FoodItem(
     foodName: String = "",
     calorie: Int = 0,
     isHistory: Boolean = false,
+    isHasButton: Boolean = false,
     onClick: () -> Unit,
     onIconClick: () -> Unit
 ) {
@@ -91,16 +92,18 @@ fun FoodItem(
                 modifier = Modifier
                     .weight(1f)
             )
-            IconButton(
-                onClick = onIconClick
-            ) {
-                Icon(
-                    painter = if (isHistory) painterResource(id = R.drawable.ic_minus) else painterResource(
-                        id = R.drawable.ic_circle_plus
-                    ),
-                    tint = if (isHistory) Danger else Success,
-                    contentDescription = stringResource(id = R.string.content_description)
-                )
+            if (isHasButton) {
+                IconButton(
+                    onClick = onIconClick
+                ) {
+                    Icon(
+                        painter = if (isHistory) painterResource(id = R.drawable.ic_minus) else painterResource(
+                            id = R.drawable.ic_circle_plus
+                        ),
+                        tint = if (isHistory) Danger else Success,
+                        contentDescription = stringResource(id = R.string.content_description)
+                    )
+                }
             }
         }
     }

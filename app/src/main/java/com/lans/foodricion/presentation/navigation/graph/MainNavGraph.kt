@@ -168,7 +168,8 @@ fun MainNavGraph(
                     mainNavController.navigate(route = MainRoute.FoodDetailScreen.route + "/${foodName}") {
                         popUpTo(route = MainRoute.FoodScreen.route)
                     }
-                }
+                },
+                isAuthenticated = isAuthenticated
             )
         }
         composable(route = MainRoute.FoodDetailScreen.route + "/{foodName}") {
