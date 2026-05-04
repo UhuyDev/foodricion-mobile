@@ -16,7 +16,13 @@ interface SafeApiCall {
             } catch (e: Throwable) {
                 when (e) {
                     is HttpException -> {
-                        Resource.Error(e.message.toString())
+                        if (e.message().toString() == "HTTP 401 Unauthorized" || e.message()
+                                .toString() == "HTTP 401"
+                        ) {
+                            Resource.Error("Your session has been expired")
+                        } else {
+                            Resource.Error(e.message.toString())
+                        }
                     }
 
                     is UnknownHostException -> {

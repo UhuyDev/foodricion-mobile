@@ -3,18 +3,36 @@ package com.lans.foodricion.di
 import android.content.Context
 import com.lans.foodricion.common.Constant.BASE_URL
 import com.lans.foodricion.data.repository.AuthRepository
+import com.lans.foodricion.data.repository.ChatbotRepository
+import com.lans.foodricion.data.repository.DailyNutritionRepository
+import com.lans.foodricion.data.repository.FoodRepository
 import com.lans.foodricion.data.repository.UserRepository
 import com.lans.foodricion.data.source.local.DataStoreManager
 import com.lans.foodricion.data.source.network.AuthAuthenticator
 import com.lans.foodricion.data.source.network.AuthInterceptor
 import com.lans.foodricion.data.source.network.api.FoodricionApi
 import com.lans.foodricion.data.tensorflow.TfLiteClassifier
+import com.lans.foodricion.domain.interactor.AddDailyNutritionInteractor
+import com.lans.foodricion.domain.interactor.CalculateBMIInteractor
+import com.lans.foodricion.domain.interactor.ChangePasswordInteractor
+import com.lans.foodricion.domain.interactor.DeleteDailyNutritionInteractor
 import com.lans.foodricion.domain.interactor.ForgotPasswordInteractor
+import com.lans.foodricion.domain.interactor.GetChatbotHistoryInteractor
+import com.lans.foodricion.domain.interactor.GetDailyNutritionsInteractor
+import com.lans.foodricion.domain.interactor.GetFoodByNameInteractor
+import com.lans.foodricion.domain.interactor.GetFoodRecommendationInteractor
+import com.lans.foodricion.domain.interactor.GetFoodsInteractor
 import com.lans.foodricion.domain.interactor.GetImageTempUriInteractor
+import com.lans.foodricion.domain.interactor.GetMeInteractor
 import com.lans.foodricion.domain.interactor.IsAuthenticatedInteractor
+import com.lans.foodricion.domain.interactor.SearchFoodByNameInteractor
+import com.lans.foodricion.domain.interactor.SendChatBotMessageInteractor
 import com.lans.foodricion.domain.interactor.SignInInteractor
+import com.lans.foodricion.domain.interactor.SignOutInteractor
 import com.lans.foodricion.domain.interactor.SignUpInteractor
 import com.lans.foodricion.domain.interactor.StoreSessionInteractor
+import com.lans.foodricion.domain.interactor.UpdateProfileInteractor
+import com.lans.foodricion.domain.interactor.UpdateProfileMetricsInteractor
 import com.lans.foodricion.domain.interactor.VerifyOTPInteractor
 import com.lans.foodricion.domain.interactor.validator.ValidateConfirmPasswordInteractor
 import com.lans.foodricion.domain.interactor.validator.ValidateEmailInteractor
@@ -23,14 +41,32 @@ import com.lans.foodricion.domain.interactor.validator.ValidateOTPInteractor
 import com.lans.foodricion.domain.interactor.validator.ValidatePasswordInteractor
 import com.lans.foodricion.domain.interactor.validator.ValidatorInteractor
 import com.lans.foodricion.domain.repository.IAuthRepository
+import com.lans.foodricion.domain.repository.IChatbotRepository
+import com.lans.foodricion.domain.repository.IDailyNutritionRepository
+import com.lans.foodricion.domain.repository.IFoodRepository
 import com.lans.foodricion.domain.repository.IUserRepository
 import com.lans.foodricion.domain.tensorflow.FoodClassifier
+import com.lans.foodricion.domain.usecase.AddDailyNutritionUseCase
+import com.lans.foodricion.domain.usecase.CalculateBMIUseCase
+import com.lans.foodricion.domain.usecase.ChangePasswordUseCase
+import com.lans.foodricion.domain.usecase.DeleteDailyNutritionUseCase
 import com.lans.foodricion.domain.usecase.ForgotPasswordUseCase
+import com.lans.foodricion.domain.usecase.GetChatbotHistoryUseCase
+import com.lans.foodricion.domain.usecase.GetDailyNutritionsUseCase
+import com.lans.foodricion.domain.usecase.GetFoodByNameUseCase
+import com.lans.foodricion.domain.usecase.GetFoodsUseCase
 import com.lans.foodricion.domain.usecase.GetImageTempUriUseCase
+import com.lans.foodricion.domain.usecase.GetMeUseCase
+import com.lans.foodricion.domain.usecase.GetRecommendationFoodUseCase
 import com.lans.foodricion.domain.usecase.IsAuthenticatedUseCase
+import com.lans.foodricion.domain.usecase.SearchFoodByNameUseCase
+import com.lans.foodricion.domain.usecase.SendChatbotMessageUseCase
 import com.lans.foodricion.domain.usecase.SignInUseCase
+import com.lans.foodricion.domain.usecase.SignOutUseCase
 import com.lans.foodricion.domain.usecase.SignUpUseCase
 import com.lans.foodricion.domain.usecase.StoreSessionUseCase
+import com.lans.foodricion.domain.usecase.UpdateProfileMetricsUseCase
+import com.lans.foodricion.domain.usecase.UpdateProfileUseCase
 import com.lans.foodricion.domain.usecase.VerifyOTPUseCase
 import com.lans.foodricion.domain.usecase.validator.ValidateConfirmPasswordUseCase
 import com.lans.foodricion.domain.usecase.validator.ValidateEmailUseCase
@@ -116,6 +152,30 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideChatbotRepository(
+        api: FoodricionApi
+    ): IChatbotRepository {
+        return ChatbotRepository(api)
+    }
+
+    @Provides
+    @Singleton
+    fun provideFoodRepository(
+        api: FoodricionApi
+    ): IFoodRepository {
+        return FoodRepository(api)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDailyNutritionRepository(
+        api: FoodricionApi
+    ): IDailyNutritionRepository {
+        return DailyNutritionRepository(api)
+    }
+
+    @Provides
+    @Singleton
     fun provideSignInUseCase(authRepository: IAuthRepository): SignInUseCase {
         return SignInInteractor(authRepository)
     }
@@ -124,6 +184,18 @@ object AppModule {
     @Singleton
     fun provideSignUpUseCase(authRepository: IAuthRepository): SignUpUseCase {
         return SignUpInteractor(authRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSignOutUseCase(authRepository: IAuthRepository): SignOutUseCase {
+        return SignOutInteractor(authRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetMeUseCase(userRepository: IUserRepository): GetMeUseCase {
+        return GetMeInteractor(userRepository)
     }
 
     @Provides
@@ -140,8 +212,26 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideChangePasswordUseCase(userRepository: UserRepository): ChangePasswordUseCase {
+        return ChangePasswordInteractor(userRepository)
+    }
+
+    @Provides
+    @Singleton
     fun provideForgotPasswordUseCase(userRepository: UserRepository): ForgotPasswordUseCase {
         return ForgotPasswordInteractor(userRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideUpdateProfileUseCase(userRepository: IUserRepository): UpdateProfileUseCase {
+        return UpdateProfileInteractor(userRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideUpdateProfileMetricsUseCase(userRepository: IUserRepository): UpdateProfileMetricsUseCase {
+        return UpdateProfileMetricsInteractor(userRepository)
     }
 
     @Provides
@@ -154,6 +244,66 @@ object AppModule {
     @Singleton
     fun provideGetImageTempUriUseCase(@ApplicationContext context: Context): GetImageTempUriUseCase {
         return GetImageTempUriInteractor(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSendChatbotMessageUseCase(chatbotRepository: ChatbotRepository): SendChatbotMessageUseCase {
+        return SendChatBotMessageInteractor(chatbotRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetChatbotHistoryUseCase(chatbotRepository: ChatbotRepository): GetChatbotHistoryUseCase {
+        return GetChatbotHistoryInteractor(chatbotRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetFoodByNameUseCase(foodRepository: IFoodRepository): GetFoodByNameUseCase {
+        return GetFoodByNameInteractor(foodRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetFoodsUseCase(foodRepository: IFoodRepository): GetFoodsUseCase {
+        return GetFoodsInteractor(foodRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetFoodRecommendationUseCase(foodRepository: IFoodRepository): GetRecommendationFoodUseCase {
+        return GetFoodRecommendationInteractor(foodRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSearchFoodByNameUseCase(): SearchFoodByNameUseCase {
+        return SearchFoodByNameInteractor()
+    }
+
+    @Provides
+    @Singleton
+    fun provideCalculateBMIUseCase(): CalculateBMIUseCase {
+        return CalculateBMIInteractor()
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetDailyNutritionsUseCase(dailyNutritionRepository: IDailyNutritionRepository): GetDailyNutritionsUseCase {
+        return GetDailyNutritionsInteractor(dailyNutritionRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAddDailyNutritionUseCase(dailyNutritionRepository: IDailyNutritionRepository): AddDailyNutritionUseCase {
+        return AddDailyNutritionInteractor(dailyNutritionRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDeleteDailyNutritionUseCase(dailyNutritionRepository: IDailyNutritionRepository): DeleteDailyNutritionUseCase {
+        return DeleteDailyNutritionInteractor(dailyNutritionRepository)
     }
 
     @Provides

@@ -7,31 +7,36 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.MediaStore
 import android.provider.Settings
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -43,57 +48,89 @@ import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.rememberAsyncImagePainter
 import com.lans.foodricion.R
+import com.lans.foodricion.presentation.component.alert.Alert
 import com.lans.foodricion.presentation.component.alert.CameraPermissionTextProvider
 import com.lans.foodricion.presentation.component.alert.PermissionAlert
-import com.lans.foodricion.presentation.component.bottom_sheet.BottomSheet
+import com.lans.foodricion.presentation.component.bottom_sheet.ScanBottomSheet
+import com.lans.foodricion.presentation.component.bottom_sheet.ScanResultBottomSheet
 import com.lans.foodricion.presentation.component.button.CardButton
 import com.lans.foodricion.presentation.component.daily_nutrition.DailyNutrition
-import com.lans.foodricion.presentation.component.nutrition_history.NutritionHistoryItem
+import com.lans.foodricion.presentation.component.food_item.FoodItem
+import com.lans.foodricion.presentation.component.unauthenticated_message.UnauthenticatedMessage
 import com.lans.foodricion.presentation.theme.Background
 import com.lans.foodricion.presentation.theme.Black
+import com.lans.foodricion.presentation.theme.Neutral
 import com.lans.foodricion.presentation.theme.Primary
 import com.lans.foodricion.presentation.theme.PrimaryContainer
 import com.lans.foodricion.utils.getActivity
+import com.lans.foodricion.utils.getMinimumNutrition
+import java.util.Locale
 
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
-    innerPadding: PaddingValues
+    innerPadding: PaddingValues,
+    navigateToSignIn: () -> Unit,
+    navigateToEditProfile: (fullname: String, email: String, age: String, height: String, weight: String) -> Unit,
+    navigateToFood: () -> Unit,
+    navigateToFoodDetail: (foodName: String) -> Unit,
+    navigateToBMI: () -> Unit,
+    isAuthenticated: Boolean
 ) {
     val context = LocalContext.current
     val state by viewModel.state
     var showPermissionAlert by remember { mutableStateOf(false) }
     var showBottomSheet by remember { mutableStateOf(false) }
-    var showTemp by remember { mutableStateOf(false) }
+    var showResult by remember { mutableStateOf(false) }
+    var showAlert by remember { mutableStateOf(Pair(false, "")) }
+
+    if (showAlert.first) {
+        Alert(
+            title = "Error",
+            description = showAlert.second,
+            onDismissClick = {
+                showAlert = showAlert.copy(first = false)
+            },
+            onConfirmClick = {
+                Button(onClick = {
+                    showAlert = showAlert.copy(first = false)
+                }) {
+                    Text(text = "Close")
+                }
+            }
+        )
+    }
 
     val permission = Manifest.permission.CAMERA
     val authority = stringResource(id = R.string.file_provider)
     val takePhotoLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture(),
-        onResult = {
-            state.tempUri = state.tempUri
-            showTemp = true
+        onResult = { success ->
+            if (success) {
+                if (state.tempUri != Uri.EMPTY) {
+                    state.rotation = 0
+                    state.classifierResult = viewModel.classify(
+                        MediaStore.Images.Media.getBitmap(context.contentResolver, state.tempUri),
+                        state.rotation
+                    )
+                    showResult = true
+                }
+            }
         }
     )
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = {
-            state.tempUri = it!!
-            state.rotation = 0
-            Log.d(
-                "BITMAP",
-                (MediaStore.Images.Media.getBitmap(
-                    context.contentResolver,
-                    state.tempUri
-                ) != null).toString()
-            )
-            state.classifierResult = viewModel.classify(
-                MediaStore.Images.Media.getBitmap(context.contentResolver, state.tempUri),
-                state.rotation
-            )
-            showTemp = true
+            if (it != null) {
+                state.tempUri = it
+                state.rotation = 0
+                state.classifierResult = viewModel.classify(
+                    MediaStore.Images.Media.getBitmap(context.contentResolver, state.tempUri),
+                    state.rotation
+                )
+                showResult = true
+            }
         }
     )
     val cameraPermissionResultLauncher = rememberLauncherForActivityResult(
@@ -108,31 +145,28 @@ fun HomeScreen(
         }
     )
 
-    if (showTemp) {
-        ModalBottomSheet(
-            modifier = Modifier,
-            onDismissRequest = {
-                showTemp = false
-            },
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        horizontal = 24.dp,
-                    )
-            ) {
-                Image(
-                    modifier = Modifier
-                        .padding(16.dp, 8.dp),
-                    painter = rememberAsyncImagePainter(state.tempUri),
-                    contentDescription = null
-                )
-                state.classifierResult.forEach {
-                    Text(text = it.name)
-                }
+    if (showResult) {
+        val result = if (state.classifierResult.isNotEmpty()) {
+            state.classifierResult[0].name.replaceFirstChar {
+                if (it.isLowerCase()) it.titlecase(
+                    Locale.getDefault()
+                ) else it.toString()
             }
-        }
+        } else stringResource(
+            R.string.unknown
+        )
+        ScanResultBottomSheet(
+            modifier = Modifier,
+            imgUri = state.tempUri,
+            result = result,
+            onCheckNutritionClick = {
+                navigateToFoodDetail.invoke(result)
+            },
+            onDismissClick = {
+                showResult = false
+                state.classifierResult = emptyList()
+            }
+        )
     }
 
     if (showPermissionAlert) {
@@ -157,7 +191,7 @@ fun HomeScreen(
     }
 
     if (showBottomSheet) {
-        BottomSheet(
+        ScanBottomSheet(
             modifier = Modifier,
             onDismissClick = {
                 showBottomSheet = false
@@ -185,28 +219,131 @@ fun HomeScreen(
             })
     }
 
+    LaunchedEffect(key1 = isAuthenticated) {
+        if (isAuthenticated) {
+            viewModel.getMe()
+            viewModel.getDailyNutritions()
+            viewModel.getFoodRecommendation()
+        }
+    }
+
+    LaunchedEffect(key1 = state.user) {
+        val user = state.user
+        if (user != null) {
+            if (user.userMetric.age == 0) {
+                navigateToEditProfile.invoke(
+                    user.fullname,
+                    user.email,
+                    user.userMetric.age.toString(),
+                    user.userMetric.height.toString(),
+                    user.userMetric.weight.toString()
+                )
+                state.user = null
+            }
+        }
+    }
+
+    LaunchedEffect(
+        key1 = state.isDailyNutritionAdded,
+        key2 = state.isHistoryDeleted,
+        key3 = state.error
+    ) {
+        if (isAuthenticated) {
+            if (state.isDailyNutritionAdded) {
+                Toast.makeText(context, "Added to daily nutrition", Toast.LENGTH_SHORT).show()
+                viewModel.getDailyNutritions()
+                viewModel.getFoodRecommendation()
+                state.isDailyNutritionAdded = false
+            }
+            if (state.isHistoryDeleted) {
+                viewModel.getDailyNutritions()
+                viewModel.getFoodRecommendation()
+                state.isHistoryDeleted = false
+            }
+        }
+
+        val error = state.error
+        if (error.isNotBlank()) {
+            if (error != "HTTP 404 Not Found") {
+                if (error != "HTTP 401") {
+                    if(error != "HTTP 401 "){
+                        if (error != "HTTP 404 ") {
+                            showAlert = Pair(true, state.error)
+                            state.error = ""
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     Column(
         modifier = Modifier
             .background(Background)
-            .statusBarsPadding()
-            .padding(
-                top = 8.dp,
-                bottom = innerPadding.calculateBottomPadding()
-            )
+            .padding(innerPadding)
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
     ) {
-        DailyNutrition(
-            modifier = Modifier,
-            calorieValue = 200f,
-            calorieMaxValue = 1800f,
-            proteinValue = 200f,
-            proteinMaxValue = 1800f,
-            carboValue = 200f,
-            carboMaxValue = 1800f,
-            fiberValue = 200f,
-            fiberMaxValue = 1800f,
-            fatValue = 200f,
-            fatMaxValue = 1800f
-        )
+        if (!isAuthenticated) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        start = 24.dp,
+                        top = 8.dp,
+                        end = 24.dp
+                    )
+                    .weight(1f),
+                colors = CardDefaults.cardColors(
+                    containerColor = PrimaryContainer
+                )
+            ) {
+                UnauthenticatedMessage {
+                    navigateToSignIn.invoke()
+                }
+            }
+        } else {
+            if (state.nutritionHistory.isNotEmpty()) {
+                val minimumNutrition = getMinimumNutrition(state.user!!.userMetric.age)
+                DailyNutrition(
+                    modifier = Modifier
+                        .padding(
+                            top = 8.dp
+                        ),
+                    calorieValue = state.nutritionHistory.sumOf { it.foodNutrition.energy }
+                        .toFloat(),
+                    calorieMaxValue = minimumNutrition.calorie.toFloat(),
+                    proteinValue = state.nutritionHistory.sumOf { it.foodNutrition.protein }
+                        .toFloat(),
+                    proteinMaxValue = minimumNutrition.protein.toFloat(),
+                    carboValue = state.nutritionHistory.sumOf { it.foodNutrition.totalCarbohydrate }
+                        .toFloat(),
+                    carboMaxValue = minimumNutrition.carbohydrate.toFloat(),
+                    fiberValue = state.nutritionHistory.sumOf { it.foodNutrition.dietaryFiber }
+                        .toFloat(),
+                    fiberMaxValue = minimumNutrition.fiber.toFloat(),
+                    fatValue = state.nutritionHistory.sumOf { it.foodNutrition.totalFat }.toFloat(),
+                    fatMaxValue = minimumNutrition.fat.toFloat()
+                )
+            } else {
+                DailyNutrition(
+                    modifier = Modifier
+                        .padding(
+                            top = 8.dp
+                        ),
+                    calorieValue = 0f,
+                    calorieMaxValue = 0f,
+                    proteinValue = 0f,
+                    proteinMaxValue = 0f,
+                    carboValue = 0f,
+                    carboMaxValue = 0f,
+                    fiberValue = 0f,
+                    fiberMaxValue = 0f,
+                    fatValue = 0f,
+                    fatMaxValue = 0f
+                )
+            }
+        }
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -231,6 +368,7 @@ fun HomeScreen(
                 iconColor = Primary,
                 text = stringResource(R.string.foods),
                 onClick = {
+                    navigateToFood.invoke()
                 }
             )
             CardButton(
@@ -238,71 +376,188 @@ fun HomeScreen(
                 icon = painterResource(id = R.drawable.ic_calculator),
                 iconColor = Primary,
                 text = stringResource(R.string.bmi),
-                onClick = { }
+                onClick = {
+                    navigateToBMI.invoke()
+                }
             )
+        }
+        if (state.foodRecommendation.isNotEmpty()) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(300.dp)
+                    .padding(
+                        start = 24.dp,
+                        end = 24.dp,
+                        bottom = 16.dp
+                    ),
+                colors = CardDefaults.cardColors(
+                    containerColor = PrimaryContainer
+                )
+            ) {
+                if (state.isLoading) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .size(24.dp),
+                            color = Primary
+                        )
+                    }
+                } else {
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                top = 16.dp
+                            ),
+                        text = stringResource(R.string.food_recommendation),
+                        color = Black,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center
+                    )
+                    if (state.nutritionHistory.isEmpty()) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                text = stringResource(R.string.no_history_data),
+                                color = Neutral,
+                                fontSize = 14.sp,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(
+                                    start = 12.dp,
+                                    top = 12.dp,
+                                    end = 12.dp,
+                                    bottom = 16.dp
+                                ),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            items(state.foodRecommendation) { recommendation ->
+                                FoodItem(
+                                    modifier = Modifier,
+                                    dailyNutritionId = 0,
+                                    imgUrl = recommendation.foodImage,
+                                    foodName = recommendation.foodName,
+                                    calorie = recommendation.foodNutrition.energy.toInt(),
+                                    onClick = {
+                                        navigateToFoodDetail.invoke(recommendation.foodName)
+                                    },
+                                    onIconClick = {
+                                        viewModel.addDailyNutrition(recommendation.foodName)
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+            }
         }
         Card(
             modifier = Modifier
                 .fillMaxWidth()
+                .height(300.dp)
                 .padding(
-                    start = 24.dp,
-                    end = 24.dp,
-                    bottom = 16.dp
-                )
-                .weight(1f),
+                    horizontal = 24.dp
+                ),
             colors = CardDefaults.cardColors(
                 containerColor = PrimaryContainer
             )
         ) {
-            Text(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        top = 16.dp,
-                        bottom = 12.dp
-                    ),
-                text = stringResource(R.string._29_jan_2024),
-                color = Black,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
-            )
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .verticalScroll(rememberScrollState())
-                    .padding(
-                        start = 12.dp,
-                        end = 12.dp,
-                        bottom = 16.dp
-                    ),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                NutritionHistoryItem(
-                    imgUrl = "",
-                    calorie = 220,
-                    onClick = { }
-                )
-                NutritionHistoryItem(
-                    imgUrl = "",
-                    calorie = 220,
-                    onClick = { }
-                )
-                NutritionHistoryItem(
-                    imgUrl = "",
-                    calorie = 220,
-                    onClick = { }
-                )
-                NutritionHistoryItem(
-                    imgUrl = "",
-                    calorie = 220,
-                    onClick = { }
-                )
-                NutritionHistoryItem(
-                    imgUrl = "",
-                    calorie = 220,
-                    onClick = { }
-                )
+            if (state.isLoading) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .size(24.dp),
+                        color = Primary
+                    )
+                }
+            } else {
+                if (!isAuthenticated) {
+                    UnauthenticatedMessage {
+                        navigateToSignIn.invoke()
+                    }
+                } else {
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                top = 16.dp
+                            ),
+                        text = stringResource(R.string.daily_food_history),
+                        color = Black,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center
+                    )
+                    if (state.nutritionHistory.isEmpty()) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                text = stringResource(R.string.no_history_data),
+                                color = Neutral,
+                                fontSize = 14.sp,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(
+                                    start = 12.dp,
+                                    top = 12.dp,
+                                    end = 12.dp,
+                                    bottom = 16.dp
+                                ),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            items(state.nutritionHistory) { history ->
+                                FoodItem(
+                                    modifier = Modifier,
+                                    dailyNutritionId = history.dailyNutritionId,
+                                    imgUrl = history.foodImage,
+                                    foodName = history.foodName,
+                                    calorie = history.foodNutrition.energy.toInt(),
+                                    isHistory = true,
+                                    onClick = {
+                                        navigateToFoodDetail.invoke(history.foodName)
+                                    },
+                                    onIconClick = {
+                                        viewModel.deleteDailyNutrition(history.dailyNutritionId)
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
     }

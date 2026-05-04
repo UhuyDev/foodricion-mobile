@@ -44,7 +44,7 @@ class DataStoreManager @Inject constructor(private val context: Context) {
         return context.dataStore.data.map { preferences ->
             val expired = preferences[EXPIRED_AT]
             if (expired != null) {
-                expired <= System.currentTimeMillis()
+                expired <= System.currentTimeMillis() / 1000
             } else {
                 false
             }

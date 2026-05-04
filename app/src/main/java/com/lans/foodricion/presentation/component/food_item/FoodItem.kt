@@ -1,6 +1,5 @@
-package com.lans.foodricion.presentation.component.nutrition_history
+package com.lans.foodricion.presentation.component.food_item
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,21 +21,30 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.lans.foodricion.R
 import com.lans.foodricion.presentation.theme.Black
 import com.lans.foodricion.presentation.theme.Danger
 import com.lans.foodricion.presentation.theme.PrimaryContainer
 import com.lans.foodricion.presentation.theme.RoundedLarge
+import com.lans.foodricion.presentation.theme.RoundedMedium
+import com.lans.foodricion.presentation.theme.Success
 import com.lans.foodricion.presentation.theme.White
 
 @Composable
-fun NutritionHistoryItem(
+fun FoodItem(
+    modifier: Modifier,
+    dailyNutritionId: Int,
     imgUrl: String,
-    calorie: Int,
-    onClick: () -> Unit
+    foodName: String = "",
+    calorie: Int = 0,
+    isHistory: Boolean = false,
+    isHasButton: Boolean = false,
+    onClick: () -> Unit,
+    onIconClick: () -> Unit
 ) {
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth(),
         colors = CardDefaults.cardColors(
             containerColor = PrimaryContainer
@@ -52,13 +60,17 @@ fun NutritionHistoryItem(
                 ),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(
+            AsyncImage(
                 modifier = Modifier
-                    .background(White)
+                    .background(
+                        color = White,
+                        shape = RoundedMedium
+                    )
                     .clip(RoundedLarge)
                     .size(50.dp),
-                painter = painterResource(id = R.drawable.img_food),
-                contentDescription = stringResource(id = R.string.content_description)
+                model = imgUrl,
+                error = painterResource(id = R.drawable.img_food),
+                contentDescription = stringResource(R.string.content_description)
             )
             Spacer(
                 modifier = Modifier
@@ -66,7 +78,7 @@ fun NutritionHistoryItem(
             )
             Column {
                 Text(
-                    text = stringResource(R.string.lorem_ipsum),
+                    text = foodName,
                     color = Black,
                     fontWeight = FontWeight.Bold
                 )
@@ -80,16 +92,18 @@ fun NutritionHistoryItem(
                 modifier = Modifier
                     .weight(1f)
             )
-            IconButton(
-                onClick = {
-
+            if (isHasButton) {
+                IconButton(
+                    onClick = onIconClick
+                ) {
+                    Icon(
+                        painter = if (isHistory) painterResource(id = R.drawable.ic_minus) else painterResource(
+                            id = R.drawable.ic_circle_plus
+                        ),
+                        tint = if (isHistory) Danger else Success,
+                        contentDescription = stringResource(id = R.string.content_description)
+                    )
                 }
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_minus),
-                    tint = Danger,
-                    contentDescription = stringResource(id = R.string.content_description)
-                )
             }
         }
     }

@@ -25,7 +25,8 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -85,16 +86,20 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter)
     implementation(libs.retrofit.interceptor)
+    implementation(libs.tflite)
+    implementation(libs.tflite.metadata)
     implementation(libs.tflite.task.vision)
     implementation(libs.tflite.gpu)
     implementation(libs.tflite.gpu.delegate)
     implementation(libs.jwt.decode)
     implementation(libs.preferences.datastore)
+    implementation(libs.constraintlayout)
     ksp(libs.dagger.hilt.compiler)
     implementation(libs.navigation.compose)
     implementation(libs.lifecycle.livedata.ktx)
     implementation(libs.lifecycle.viewmodel.ktx)
     implementation(libs.accompanist.permission)
+    implementation(libs.accompanist.insets)
     implementation(libs.coil.compose)
     testImplementation(libs.junit)
     androidTestImplementation(libs.test.ext)

@@ -5,6 +5,9 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -15,12 +18,15 @@ import com.lans.foodricion.presentation.navigation.graph.MainNavGraph
 
 @Composable
 fun MainScreen(
-    rootNavController: NavHostController
+    rootNavController: NavHostController,
+    isAuthenticated: Boolean,
 ) {
     val mainNavController = rememberNavController()
     val activity = LocalContext.current as Activity
     val navBackStackEntry by mainNavController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination
+    var lastSelectedRoute by remember { mutableStateOf<MainRoute>(MainRoute.HomeScreen) }
+
     BackHandler {
         if (currentRoute?.route == MainRoute.HomeScreen.route) {
             activity.finish()
@@ -28,11 +34,35 @@ fun MainScreen(
     }
     Scaffold(
         bottomBar = {
-            if (currentRoute?.route != MainRoute.ChatBotScreen.route) {
+            val isBottomBarVisible = currentRoute?.route !in listOf(
+                MainRoute.ChatBotScreen.route,
+                MainRoute.FoodScreen.route,
+                MainRoute.FoodDetailScreen.route + "/{foodName}",
+                MainRoute.EditProfileScreen.route + "/{fullname}/{email}/{age}/{height}/{weight}",
+                MainRoute.BMIScreen.route
+            )
+
+            if (isBottomBarVisible) {
                 BottomNavigationBar(
-                    navigateToHome = { mainNavController.navigate(MainRoute.HomeScreen.route) },
-                    navigateToAskBot = { mainNavController.navigate(MainRoute.ChatBotScreen.route) },
-                    navigateToProfile = { mainNavController.navigate(MainRoute.ProfileScreen.route) }
+                    selectedItem = lastSelectedRoute,
+                    navigateToHome = {
+                        mainNavController.navigate(MainRoute.HomeScreen.route) {
+                            popUpTo(MainRoute.HomeScreen.route) { inclusive = true }
+                        }
+                        lastSelectedRoute = MainRoute.HomeScreen
+                    },
+                    navigateToAskBot = {
+                        mainNavController.navigate(MainRoute.ChatBotScreen.route)
+                    },
+                    navigateToProfile = {
+                        mainNavController.navigate(MainRoute.ProfileScreen.route) {
+                            popUpTo(MainRoute.ProfileScreen.route) { inclusive = true }
+                        }
+                        lastSelectedRoute = MainRoute.ProfileScreen
+                    },
+                    onItemSelected = { route ->
+                        lastSelectedRoute = route
+                    }
                 )
             }
         }
@@ -40,7 +70,8 @@ fun MainScreen(
         MainNavGraph(
             rootNavController = rootNavController,
             mainNavController = mainNavController,
-            innerPadding = paddingValues
+            innerPadding = paddingValues,
+            isAuthenticated = isAuthenticated
         )
     }
 }

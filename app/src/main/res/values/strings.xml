@@ -38,7 +38,7 @@
     <string name="profile">Profile</string>
     <string name="change_password">Change Password</string>
     <string name="language">Language</string>
-    <string name="about_us">About Us</string>
+    <string name="about">About</string>
     <string name="terms_condition"><![CDATA[Terms & Condition]]></string>
     <string name="privacy_and_policy">Privacy and Policy</string>
     <string name="contact_us">Contact Us</string>
@@ -53,4 +53,22 @@
     <string name="delete">Delete</string>
     <string name="this_action_cannot_be_undone_and_you_will_lose_all_your_data_and_history_permanently">This action cannot be undone and you will lose all your data and history permanently.</string>
     <string name="delete_my_account">Delete My Account</string>
+    <string name="old_password">Old Password</string>
+    <string name="nutritions">Nutritions</string>
+    <string name="no_food_data_available">No food data available.</string>
+    <string name="add_to_daily_nutrition">Add to daily nutrition</string>
+    <string name="height_cm">Height (cm)</string>
+    <string name="weight_kg">Weight (kg)</string>
+    <string name="calculate">Calculate</string>
+    <string name="score">Score</string>
+    <string name="category">Category</string>
+    <string name="bmi_calculator">BMI Calculator</string>
+    <string name="unknown">Unknown</string>
+    <string name="check_nutrition">Check Nutrition</string>
+    <string name="age">Age</string>
+    <string name="height">Height</string>
+    <string name="weight">Weight</string>
+    <string name="no_history_data">No history data</string>
+    <string name="daily_food_history">Daily Food History</string>
+    <string name="food_recommendation">Food Recommendation</string>
 </resources>

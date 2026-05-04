@@ -4,20 +4,23 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,21 +32,83 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.lans.foodricion.R
+import com.lans.foodricion.presentation.component.alert.Alert
 import com.lans.foodricion.presentation.component.profile_button_item.ProfileButton
+import com.lans.foodricion.presentation.component.shimmer.Shimmer
 import com.lans.foodricion.presentation.theme.Background
 import com.lans.foodricion.presentation.theme.Black
 import com.lans.foodricion.presentation.theme.Danger
 import com.lans.foodricion.presentation.theme.Primary
 import com.lans.foodricion.presentation.theme.PrimaryDark
+import com.lans.foodricion.presentation.theme.RoundedLarge
 import com.lans.foodricion.presentation.theme.RoundedMedium
 import com.lans.foodricion.presentation.theme.White
 
 @Composable
 fun ProfileScreen(
     viewModel: ProfileViewModel = hiltViewModel(),
-    innerPadding: PaddingValues
+    isAuthenticated: Boolean,
+    navigateToSignIn: () -> Unit,
+    navigateToSignUp: () -> Unit,
+    navigateToEditProfile: (fullname: String, email: String, age: String, height: String, weight: String) -> Unit,
+    navigateToChangePassword: () -> Unit,
+    signOut: () -> Unit
 ) {
-    val isLoggedIn = false
+    val state = viewModel.state.value
+    var showAlert by remember { mutableStateOf(Pair(false, "")) }
+    var showConfirmation by remember { mutableStateOf(false) }
+
+    if (showAlert.first) {
+        Alert(
+            title = "Error",
+            description = showAlert.second,
+            onDismissClick = {
+                showAlert = showAlert.copy(first = false)
+            },
+            onConfirmClick = {
+                Button(onClick = {
+                    showAlert = showAlert.copy(first = false)
+                }) {
+                    Text(text = "Close")
+                }
+            }
+        )
+    }
+
+    if (showConfirmation) {
+        Alert(
+            title = "Sign Out",
+            description = "Do you want to sign out?",
+            onDismissClick = {
+                showConfirmation = false
+            },
+            onConfirmClick = {
+                Button(onClick = {
+                    showConfirmation = false
+                }) {
+                    Text(text = "Close")
+                }
+            }
+        )
+    }
+
+    LaunchedEffect(key1 = isAuthenticated) {
+        if (isAuthenticated) {
+            viewModel.getMe()
+        }
+    }
+
+    LaunchedEffect(key1 = state.error) {
+        if (!isAuthenticated) {
+            val error = state.error
+
+            if (error.isNotBlank()) {
+                showAlert = Pair(true, state.error)
+                state.error = ""
+            }
+        }
+    }
+
     Column(
         modifier = Modifier
             .background(Background)
@@ -55,6 +120,7 @@ fun ProfileScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(
+                    top = 8.dp,
                     bottom = 24.dp
                 ),
             text = stringResource(R.string.profile),
@@ -64,7 +130,7 @@ fun ProfileScreen(
             fontWeight = FontWeight.Bold
         )
 
-        if (isLoggedIn) {
+        if (isAuthenticated) {
             Row(
                 modifier = Modifier
                     .padding(
@@ -78,6 +144,7 @@ fun ProfileScreen(
                     )
                     .fillMaxWidth()
                     .padding(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
@@ -90,22 +157,39 @@ fun ProfileScreen(
                     painter = painterResource(id = R.drawable.ic_profile),
                     contentDescription = stringResource(id = R.string.content_description)
                 )
-                Spacer(
-                    modifier = Modifier
-                        .width(16.dp)
-                )
                 Column(
                     modifier = Modifier
-                        .weight(1f)
+                        .weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Text(
-                        text = stringResource(R.string.name_example),
+                        modifier = Modifier
+                            .background(
+                                brush = Shimmer(
+                                    targetValue = 1300f,
+                                    showShimmer = state.isLoading
+                                ),
+                                shape = RoundedLarge,
+                                alpha = 0.8f
+                            )
+                            .fillMaxWidth(),
+                        text = state.user?.fullname ?: "",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
                     )
                     Text(
-                        text = stringResource(R.string.email_example),
+                        modifier = Modifier
+                            .background(
+                                brush = Shimmer(
+                                    targetValue = 1300f,
+                                    showShimmer = state.isLoading
+                                ),
+                                shape = RoundedLarge,
+                                alpha = 0.8f
+                            )
+                            .fillMaxWidth(),
+                        text = state.user?.email ?: "",
                         fontSize = 16.sp,
                         color = Color.White
                     )
@@ -116,7 +200,15 @@ fun ProfileScreen(
                             color = PrimaryDark,
                             shape = CircleShape
                         ),
-                    onClick = {}
+                    onClick = {
+                        navigateToEditProfile.invoke(
+                            state.user?.fullname ?: "",
+                            state.user?.email ?: "",
+                            state.user?.userMetric?.age.toString(),
+                            state.user?.userMetric?.height.toString(),
+                            state.user?.userMetric?.weight.toString()
+                        )
+                    }
                 ) {
                     Icon(
                         modifier = Modifier
@@ -134,43 +226,29 @@ fun ProfileScreen(
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            if (!isLoggedIn) {
+            if (!isAuthenticated) {
                 ProfileButton(
                     modifier = Modifier,
                     text = stringResource(id = R.string.sign_in),
-                    onClick = {}
+                    onClick = {
+                        navigateToSignIn.invoke()
+                    }
                 )
                 ProfileButton(
                     modifier = Modifier,
-                    text = "Sign Up",
-                    onClick = {}
+                    text = stringResource(id = R.string.sign_up),
+                    onClick = {
+                        navigateToSignUp.invoke()
+                    }
                 )
             }
 
             ProfileButton(
                 modifier = Modifier,
                 text = stringResource(R.string.change_password),
-                onClick = {}
-            )
-            ProfileButton(
-                modifier = Modifier,
-                text = stringResource(R.string.language),
-                onClick = {}
-            )
-            ProfileButton(
-                modifier = Modifier,
-                text = stringResource(R.string.about_us),
-                onClick = {}
-            )
-            ProfileButton(
-                modifier = Modifier,
-                text = stringResource(R.string.terms_condition),
-                onClick = {}
-            )
-            ProfileButton(
-                modifier = Modifier,
-                text = stringResource(R.string.privacy_and_policy),
-                onClick = {}
+                onClick = {
+                    navigateToChangePassword.invoke()
+                }
             )
             ProfileButton(
                 modifier = Modifier,
@@ -179,16 +257,19 @@ fun ProfileScreen(
             )
             ProfileButton(
                 modifier = Modifier,
-                text = stringResource(R.string.faq),
+                text = stringResource(R.string.about),
                 onClick = {}
             )
 
-            if (isLoggedIn) {
+            if (isAuthenticated) {
                 ProfileButton(
                     modifier = Modifier,
                     text = stringResource(R.string.sign_out),
                     color = Danger,
-                    onClick = {}
+                    onClick = {
+                        viewModel.onEvent(ProfileUIEvent.LogoutButtonClicked)
+                        signOut.invoke()
+                    }
                 )
             }
         }

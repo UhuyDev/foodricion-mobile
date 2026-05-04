@@ -1,4 +1,4 @@
-package com.lans.foodricion.presentation.screen.signin
+    package com.lans.foodricion.presentation.screen.signin
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

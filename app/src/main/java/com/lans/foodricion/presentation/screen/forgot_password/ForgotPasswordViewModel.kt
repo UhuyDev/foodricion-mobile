@@ -62,7 +62,7 @@ class ForgotPasswordViewModel @Inject constructor(
     private fun sendCode() {
         val stateValue = _state.value
 
-        if (stateValue.email.value.isBlank() || stateValue.isCounting) {
+        if (stateValue.isCounting) {
             return
         }
 

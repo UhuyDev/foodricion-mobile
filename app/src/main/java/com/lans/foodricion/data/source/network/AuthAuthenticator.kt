@@ -3,6 +3,7 @@ package com.lans.foodricion.data.source.network
 import com.lans.foodricion.common.Constant.BASE_URL
 import com.lans.foodricion.common.Constant.HEADER_AUTHORIZATION
 import com.lans.foodricion.common.Constant.TOKEN_TYPE
+import com.lans.foodricion.data.Resource
 import com.lans.foodricion.data.source.local.DataStoreManager
 import com.lans.foodricion.data.source.network.api.FoodricionApi
 import com.lans.foodricion.data.source.network.dto.ApiResponse
@@ -21,35 +22,63 @@ class AuthAuthenticator @Inject constructor(
     private val dataStoreManager: DataStoreManager
 ) : Authenticator, SafeApiCall {
     override fun authenticate(route: Route?, response: Response): Request? {
+        val isTokenExpired = runBlocking {
+            dataStoreManager.checkTokenExpiration().first()
+        }
+
+        val currentAccessToken = runBlocking {
+            dataStoreManager.getAccessToken().first()
+        }
+
         val currentRefreshToken = runBlocking {
             dataStoreManager.getRefreshToken().first()
         }
 
-        synchronized(this) {
-            val newToken = runBlocking {
-                refreshToken(currentRefreshToken)
-            }
-
-            if (newToken.code != 200) {
-                return null
-            }
-
-            newToken.let { body ->
-                runBlocking {
-                    dataStoreManager.storeData(
-                        DataStoreManager.ACCESS_TOKEN,
-                        body.data!!.accessToken
-                    )
-                    dataStoreManager.storeData(
-                        DataStoreManager.REFRESH_TOKEN,
-                        body.data.refreshToken
-                    )
-                    dataStoreManager.storeData(DataStoreManager.EXPIRED_AT, body.data.expiredAt)
+        return if (!isTokenExpired) {
+            response.request.newBuilder()
+                .header(HEADER_AUTHORIZATION, "$TOKEN_TYPE $currentAccessToken")
+                .build()
+        } else {
+            synchronized(this) {
+                val newToken = runBlocking {
+                    safeCall { refreshToken(currentRefreshToken) }
                 }
 
-                return response.request.newBuilder()
-                    .header(HEADER_AUTHORIZATION, "$TOKEN_TYPE ${body.data!!.accessToken}")
-                    .build()
+                when (newToken) {
+                    is Resource.Success -> {
+                        val refreshTokenResponse = newToken.data.data
+                        runBlocking {
+                            dataStoreManager.storeData(
+                                DataStoreManager.ACCESS_TOKEN,
+                                refreshTokenResponse!!.accessToken
+                            )
+                            dataStoreManager.storeData(
+                                DataStoreManager.REFRESH_TOKEN,
+                                refreshTokenResponse.refreshToken
+                            )
+                            dataStoreManager.storeData(
+                                DataStoreManager.EXPIRED_AT,
+                                refreshTokenResponse.expiredAt
+                            )
+                        }
+
+                        response.request.newBuilder()
+                            .header(
+                                HEADER_AUTHORIZATION,
+                                "$TOKEN_TYPE ${refreshTokenResponse!!.accessToken}"
+                            )
+                            .build()
+                    }
+
+                    is Resource.Error -> {
+                        runBlocking {
+                            dataStoreManager.clear()
+                        }
+                        null
+                    }
+
+                    else -> null
+                }
             }
         }
     }

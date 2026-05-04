@@ -17,8 +17,8 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val isAuthenticatedUseCase: IsAuthenticatedUseCase
 ): ViewModel() {
-    private val _isAuthenticated = MutableStateFlow<Boolean?>(null)
-    val isAuthenticated: Flow<Boolean?> get() = _isAuthenticated
+    private val _isAuthenticated = MutableStateFlow(false)
+    val isAuthenticated: Flow<Boolean> get() = _isAuthenticated
     var splashState by mutableStateOf(true)
 
     init {

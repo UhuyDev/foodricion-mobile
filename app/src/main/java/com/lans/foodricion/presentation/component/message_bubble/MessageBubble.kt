@@ -23,7 +23,10 @@ fun MessageBubble(
 ) {
     Row(
         modifier = modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .padding(
+                top = 16.dp
+            ),
         horizontalArrangement = if (isUser) Arrangement.End else Arrangement.Start
     ) {
         Text(

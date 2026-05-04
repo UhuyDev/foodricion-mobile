@@ -12,7 +12,7 @@ class SignUpInteractor @Inject constructor(
     private val authRepository: IAuthRepository
 ) : SignUpUseCase {
     override suspend fun invoke(email: String, fullname: String, password: String): Flow<Resource<Boolean>> {
-        return authRepository.signup(
+        return authRepository.signUp(
             email = email,
             fullname = fullname,
             password = password

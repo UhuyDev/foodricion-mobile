@@ -2,6 +2,7 @@ package com.lans.foodricion.presentation
 
 import android.graphics.Color
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
@@ -12,11 +13,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.core.view.WindowCompat
+import androidx.lifecycle.lifecycleScope
 import com.lans.foodricion.presentation.navigation.NavGraph
 import com.lans.foodricion.presentation.navigation.graph.RootNavGraph
 import com.lans.foodricion.presentation.theme.FoodricionTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -32,15 +34,22 @@ class MainActivity : ComponentActivity() {
         )
         super.onCreate(savedInstanceState)
 
-        installSplashScreen().setKeepOnScreenCondition{ viewModel.splashState }
-
-        setContent {
-            FoodricionTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    RootNavGraph(startDestination = NavGraph.MainGraph)
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+        installSplashScreen().setKeepOnScreenCondition { viewModel.splashState }
+        lifecycleScope.launch {
+            viewModel.isAuthenticated.collect { status ->
+                setContent {
+                    FoodricionTheme {
+                        Surface(
+                            modifier = Modifier.fillMaxSize(),
+                            color = MaterialTheme.colorScheme.background
+                        ) {
+                            RootNavGraph(
+                                startDestination = NavGraph.MainGraph,
+                                isAuthenticated = status
+                            )
+                        }
+                    }
                 }
             }
         }

@@ -5,5 +5,6 @@ import com.squareup.moshi.Json
 data class VerifyOTPRequestDto(
     val email: String,
     val otp: String,
-    @field:Json(name = "new_password") val newPassword: String
+    @field:Json(name = "new_password")
+    val newPassword: String
 )

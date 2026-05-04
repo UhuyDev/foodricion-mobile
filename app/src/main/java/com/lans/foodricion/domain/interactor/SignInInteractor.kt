@@ -13,7 +13,7 @@ class SignInInteractor @Inject constructor(
     private val authRepository: IAuthRepository
 ) : SignInUseCase {
     override suspend fun invoke(email: String, password: String): Flow<Resource<Token>> {
-        return authRepository.signin(
+        return authRepository.signIn(
             email = email,
             password = password
         ).flowOn(Dispatchers.IO)

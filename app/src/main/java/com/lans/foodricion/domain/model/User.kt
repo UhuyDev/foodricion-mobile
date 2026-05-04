@@ -7,4 +7,5 @@ data class User(
     val email: String,
     val fullname: String,
     val registrationDate: Date,
+    val userMetric: UserMetric
 )

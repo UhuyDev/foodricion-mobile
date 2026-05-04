@@ -195,7 +195,7 @@ fun SignUpScreen(
                     .padding(
                         horizontal = 24.dp
                     ),
-                text = "Sign In",
+                text = stringResource(id = R.string.sign_up),
                 isLoading = state.isLoading,
                 onClick = {
                     viewModel.onEvent(SignUpUIEvent.SignUpButtonClicked)
